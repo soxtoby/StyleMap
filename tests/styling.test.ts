@@ -1,4 +1,4 @@
-import { animation, classes, cssRules, fontFace, resetStyles, style, stylesheet, updateStylesheet, variable } from "../src/styling";
+import { animation, classes, cssRules, fontFace, resetStyles, style, stylesheet, updateStylesheet, variable, requireStylesheet } from "../src/styling";
 
 beforeEach(() => {
     resetStyles();
@@ -103,6 +103,12 @@ test("classes for unrendered styles", () => {
     resetStyles();
 
     expect(() => classes([style0, style1])).toThrow();
+
+    requireStylesheet(false);
+
+    expect(() => classes([style0, style1])).not.toThrow();
+
+    requireStylesheet(true);
 });
 
 test("variables", () => {

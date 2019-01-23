@@ -7,6 +7,7 @@ let registeredRules = [] as Rules[];
 let registeredStyles = [] as [string, RegisteredStyles][];
 let registeredKeyframes = [] as [string, KeyFrames][];
 let registeredVariables = [] as Variable<any>[];
+let stylesheetRequired = true;
 export let stylesheet: HTMLStyleElement;
 export const RegisteredStyle = Symbol('StyleRendered');
 
@@ -21,7 +22,7 @@ export function classes(styleCollection: StyleCollection): string {
         return '';
     if (Array.isArray(styleCollection))
         return styleCollection.filter(Boolean).map(classes).join(' ');
-    if (styleCollection[RegisteredStyle])
+    if (styleCollection[RegisteredStyle] || !stylesheetRequired)
         return styleCollection.toString();
     throw new Error(`'${styleCollection.toString()}' style is being used, but hasn't been added to the stylesheet.`);
 }
@@ -89,6 +90,14 @@ export function updateStylesheet() {
     ensureStylesheet();
     stylesheet.innerHTML = getCss();
     registeredStyles.forEach(([, s]) => s[RegisteredStyle] = true);
+}
+
+/**
+ * Can be used to disable the requirement that styles are added to the stylesheet before being used.
+ * Useful mainly for tests. Not recommended in production.
+ */
+export function requireStylesheet(enable = true) {
+    stylesheetRequired = enable;
 }
 
 export function getCss() {
