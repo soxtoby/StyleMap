@@ -141,7 +141,8 @@ export const propertyDefaults: { [property in keyof CSS.Properties]?: (value: an
     lineHeight: defaultUnit(''),
     opacity: defaultUnit(''),
     transitionDuration: defaultUnit('ms'),
-    transitionDelay: defaultUnit('ms')
+    transitionDelay: defaultUnit('ms'),
+    zIndex: defaultUnit('')
 };
 
 export const functionDefaults: { [cssFunction: string]: (value: any) => string } = {
