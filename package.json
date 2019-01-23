@@ -1,11 +1,14 @@
 {
   "name": "stylemap",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CSS in JS/TS",
   "main": "lib/index.js",
   "types": "lib/index",
   "author": "Simon Oxtoby",
   "license": "MIT",
+  "scripts": {
+    "prepare": "./node_modules/.bin/tsc"
+  },
   "devDependencies": {
     "@types/jest": "*",
     "jest": "*",
@@ -14,5 +17,8 @@
   },
   "dependencies": {
     "csstype": "*"
-  }
+  },
+  "files": [
+    "lib"
+  ]
 }
