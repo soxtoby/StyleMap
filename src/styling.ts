@@ -88,7 +88,7 @@ function withToString<T>(obj: T, toString: () => string) {
 
 export function updateStylesheet() {
     ensureStylesheet();
-    stylesheet.innerHTML = getCss();
+    stylesheet.innerHTML = getCss() + '\n/*# sourceURL=stylemap.css */';
     registeredStyles.forEach(([, s]) => s[RegisteredStyle] = true);
 }
 

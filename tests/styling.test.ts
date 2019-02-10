@@ -1,5 +1,7 @@
 import { animation, classes, cssRules, fontFace, resetStyles, style, stylesheet, updateStylesheet, variable, requireStylesheet } from "../src/styling";
 
+const sourceUrl = '\n/*# sourceURL=stylemap.css */';
+
 beforeEach(() => {
     resetStyles();
 });
@@ -12,7 +14,7 @@ test("rules added to stylesheet", () => {
 
     expect(stylesheet.parentElement).toBe(document.head);
     expect(stylesheet.innerHTML).toBe(`.test1 { width: 1px; }
-.test2 { width: 2px; }`);
+.test2 { width: 2px; }${sourceUrl}`);
 });
 
 test("styles added to stylesheet", () => {
@@ -23,7 +25,7 @@ test("styles added to stylesheet", () => {
 
     expect(stylesheet.parentElement).toBe(document.head);
     expect(stylesheet.innerHTML).toBe(`.test-0 { width: 1px; }
-.test-1 { width: 2px; }`);
+.test-1 { width: 2px; }${sourceUrl}`);
 });
 
 test("font faces added to stylesheet", () => {
@@ -32,7 +34,7 @@ test("font faces added to stylesheet", () => {
     updateStylesheet();
 
     expect(stylesheet.parentElement).toBe(document.head);
-    expect(stylesheet.innerHTML).toBe(`@font-face { font-family: test; src: local(font); }`);
+    expect(stylesheet.innerHTML).toBe(`@font-face { font-family: test; src: local(font); }${sourceUrl}`);
 });
 
 test("keyframes added to stylesheet", () => {
@@ -47,7 +49,7 @@ test("keyframes added to stylesheet", () => {
 }
 @keyframes test-1 {
   from { width: 2px; }
-}`)
+}${sourceUrl}`)
 });
 
 test("rules returns rules", () => {
