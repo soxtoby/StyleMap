@@ -5,6 +5,7 @@
         "strict": true,
         "esModuleInterop": true,
         "inlineSourceMap": true,
+        "inlineSources": true,
         "declaration": true,
         "outDir": "lib",
         "lib": [
