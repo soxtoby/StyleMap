@@ -9,6 +9,7 @@ test("basic properties", () => {
     expect(css({ '.test': { background: 'blue' } })).toBe(`.test { background: blue; }`);
     expect(css({ '.test': { width: 5 } })).toBe(`.test { width: 5px; }`);
     expect(css({ '.test': { marginLeft: 3 } })).toBe(`.test { margin-left: 3px; }`);
+    expect(css({ '.test': { overflowX: 'auto' } })).toBe(`.test { overflow-x: auto; }`);
 });
 
 test("basic properties with multiple values", () => {

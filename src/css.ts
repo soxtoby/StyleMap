@@ -109,7 +109,7 @@ export function cssPropertyValue(property: string, value: any): string | undefin
 
 function cssFunctions(property: string, functionMap: object) {
     return Object.entries(functionMap)
-        .map(([fn, value]) => `${snakeCase(fn)}(${cssFunctionValue(property, fn, value)})`)
+        .map(([fn, value]) => `${functionSnakeCase(fn)}(${cssFunctionValue(property, fn, value)})`)
         .join(' ');
 }
 
@@ -122,6 +122,10 @@ function cssFunctionValue(property: string, fn: string, value: any): string {
 }
 
 function snakeCase(name: string) {
+    return name.replace(/[A-Z]/g, capital => `-${capital.toLowerCase()}`);
+}
+
+function functionSnakeCase(name: string) {
     return name.replace(/[A-Z](?!$)/g, capital => `-${capital.toLowerCase()}`);
 }
 
