@@ -1,5 +1,7 @@
 import { css, fontFaceCss, keyframesCss } from '../src/css';
-import { animation, variable } from '../src/styling';
+import { animation, variable, resetStyles } from '../src/styling';
+
+beforeEach(() => resetStyles());
 
 test("empty", () => {
     expect(css({ '.test': {} })).toBe('');
@@ -132,7 +134,7 @@ test("keyframes", () => {
     expect(resultLines[resultLines.length - 1]).toBe('}');
 });
 
-test("animation", () => {
+test("anonymous animation", () => {
     expect(css({
         '.test': {
             animation: animation({
@@ -142,6 +144,36 @@ test("animation", () => {
         }
     })).toBe(`.test { animation: test-animation-0 100ms ease 0ms 1 normal none running; }
 @keyframes test-animation-0 {
+  from { background: red; }
+  to { background: blue; }
+}`);
+});
+
+test("registered named animation", () => {
+    expect(css({
+        '.test': {
+            animation: animation('named-animation', {
+                from: { background: 'red' },
+                to: { background: 'blue' }
+            }, 100)
+        }
+    })).toBe(`.test { animation: named-animation-0 100ms ease 0ms 1 normal none running; }`);
+});
+
+test("unregistered named animation", () => {
+    expect(css({
+        '.test': {
+            animation: {
+                animationName: 'named-animation',
+                keyframes: {
+                    from: { background: 'red' },
+                    to: { background: 'blue' }
+                },
+                animationDuration: 100
+            }
+        }
+    })).toBe(`.test { animation: named-animation-0 100ms ease 0ms 1 normal none running; }
+@keyframes named-animation-0 {
   from { background: red; }
   to { background: blue; }
 }`);

@@ -1,6 +1,6 @@
 import * as CSS from 'csstype';
 import { css, cssPropertyValue, fontFaceCss, keyframesCss } from "./css";
-import { AnimationDefinition, CSSProperties, FontFaceDefinition, KeyFrames, PropertyType, RegisteredStyles, Rules, StyleCollection, Styles, Variable } from "./types";
+import { AnimationDefinition, CSSProperties, FontFaceDefinition, KeyFrames, PropertyType, RegisteredStyles, Rules, StyleCollection, Styles, Variable, Registered } from "./types";
 
 let registeredFontFaces = [] as FontFaceDefinition[];
 let registeredRules = [] as Rules[];
@@ -12,8 +12,7 @@ export let stylesheet: HTMLStyleElement;
 export const RegisteredStyle = Symbol('StyleRendered');
 
 export function style(name: string, styles: Styles): RegisteredStyles {
-    name = register(registeredStyles, name, styles);
-    (styles as RegisteredStyles)[RegisteredStyle] = false;
+    name = register(registeredStyles, name, styles as RegisteredStyles);
     return withToString(styles, () => name) as RegisteredStyles;
 }
 
@@ -75,9 +74,10 @@ function isVariable<T extends keyof CSSProperties>(value: any): value is Variabl
     return typeof value == 'object' && typeof value.or == 'function';
 }
 
-function register<T>(registry: [string, T][], name: string, styling: T) {
+function register<T extends Registered>(registry: [string, T][], name: string, styling: T) {
     let suffixedName = `${name}-${registry.length}`;
     registry.push([suffixedName, styling]);
+    styling[RegisteredStyle] = false;
     return suffixedName;
 }
 

@@ -1,4 +1,5 @@
 import * as CSS from 'csstype';
+import { RegisteredStyle } from './styling';
 import { AnimationDefinition, FontFaceDefinition, KeyFrames, Rules, Styles } from "./types";
 import { defaultUnit, defaultUnitAndValue, defaultValue } from "./utils";
 
@@ -50,7 +51,7 @@ function styleRules(selector: string, styles: Styles) {
 
     return baseRule(selector, properties)
         .concat(ruleSet(selector, nested))
-        .concat(animations.map(kf => keyframesCss(...kf)));
+        .concat(animations.map(kfs => keyframesCss(...kfs)));
 }
 
 function animationValues(value: CSS.AnimationProperty | AnimationDefinition, selector: string) {
@@ -62,11 +63,11 @@ function animationValues(value: CSS.AnimationProperty | AnimationDefinition, sel
 
 function singleAnimation(animation: CSS.AnimationProperty | AnimationDefinition, selector: string, index = 0): { value: string, keyframes: [string, KeyFrames][] } {
     if (typeof animation == 'object') {
-        if (animation.animationName)
+        if (!animation.keyframes || RegisteredStyle in animation.keyframes)
             return { value: animationFromDefinition(animation), keyframes: [] };
 
-        animation.animationName = defaultAnimationName(selector, index);
-        return { value: animationFromDefinition(animation), keyframes: [[animation.animationName, animation.keyframes]] };
+        let animationName = inlineAnimationName(animation.animationName, selector, index);
+        return { value: animationFromDefinition({ ...animation, animationName }), keyframes: [[animationName, animation.keyframes]] };
     }
     return { value: animation as string, keyframes: [] };
 }
@@ -84,8 +85,8 @@ function animationFromDefinition(def: AnimationDefinition) {
         .join(' ');
 }
 
-function defaultAnimationName(selector: string, index: number) {
-    return selector.replace(/[^\w\d-_]+/g, '_').replace(/^_/, '') + `-animation-${index}`;
+function inlineAnimationName(name: unknown, selector: string, index: number) {
+    return String(name || (selector + '-animation')).replace(/[^\w\d-_]+/g, '_').replace(/^_/, '') + `-${index}`;
 }
 
 function baseRule(selector: string, styles: [string, any][]) {

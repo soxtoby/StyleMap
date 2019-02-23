@@ -107,10 +107,13 @@ export interface Styles extends CSSProperties {
     '::selection'?: Styles;
 }
 
-export interface RegisteredStyles extends Styles {
+export interface Registered {
+    [RegisteredStyle]: boolean;
+}
+
+export interface RegisteredStyles extends Styles, Registered {
     /** Returns class name */
     toString(): string;
-    [RegisteredStyle]: boolean;
 }
 
 export interface Rules {
