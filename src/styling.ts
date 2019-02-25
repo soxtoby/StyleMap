@@ -112,7 +112,7 @@ function ensureStylesheet() {
     if (!stylesheet) {
         stylesheet = document.createElement('style');
         stylesheet.type = "text/css";
-        document.head.append(stylesheet);
+        document.head.appendChild(stylesheet);
     }
 }
 
