@@ -9,7 +9,7 @@ export function css(rules: Rules) {
 }
 
 export function fontFaceCss(fontFace: FontFaceDefinition) {
-    return `@font-face { ${properties(Object.entries(fontFace))} }`;
+    return `@font-face { ${cssProperties(Object.entries(fontFace))} }`;
 }
 
 export function keyframesCss(name: string, keyframes: KeyFrames) {
@@ -31,9 +31,17 @@ function ruleSet(parentSelector: string, rules: [string, Styles][]): string[] {
 }
 
 function styleRules(selector: string, styles: Styles) {
+    let { properties, nested, keyframes } = splitProperties(styles, selector);
+
+    return baseRule(selector, properties)
+        .concat(ruleSet(selector, nested))
+        .concat(keyframes.map(kfs => keyframesCss(...kfs)));
+}
+
+export function splitProperties(styles: Styles, selector: string = 'inline') {
     let properties = [] as [string, any][];
     let nested = [] as [string, Styles][];
-    let animations = [] as [string, KeyFrames][];
+    let keyframes = [] as [string, KeyFrames][];
 
     Object.entries(styles)
         .forEach(([key, value]) => {
@@ -44,14 +52,12 @@ function styleRules(selector: string, styles: Styles) {
             else if (key == 'animation') {
                 let animation = animationValues(value, selector);
                 properties.push([key, animation.value]);
-                animations = animations.concat(animation.keyframes);
+                keyframes = keyframes.concat(animation.keyframes);
             } else
                 properties.push([key, value]);
         });
 
-    return baseRule(selector, properties)
-        .concat(ruleSet(selector, nested))
-        .concat(animations.map(kfs => keyframesCss(...kfs)));
+    return { properties, nested, keyframes };
 }
 
 function animationValues(value: CSS.AnimationProperty | AnimationDefinition, selector: string) {
@@ -91,11 +97,11 @@ function inlineAnimationName(name: unknown, selector: string, index: number) {
 
 function baseRule(selector: string, styles: [string, any][]) {
     return styles.length
-        ? [`${selector} { ${properties(styles)} }`]
+        ? [`${selector} { ${cssProperties(styles)} }`]
         : [];
 }
 
-function properties(styles: [string, any][]) {
+export function cssProperties(styles: [string, any][]) {
     return styles
         .filter(([, value]) => typeof value != 'undefined')
         .map(([property, value]) => `${snakeCase(property)}: ${cssPropertyValue(property, value)};`)

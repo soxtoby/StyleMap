@@ -1,4 +1,5 @@
-import { animation, classes, cssRules, fontFace, resetStyles, style, stylesheet, updateStylesheet, variable, requireStylesheet } from "../src/styling";
+import { animation, classes, cssRules, fontFace, resetStyles, style, stylesheet, updateStylesheet, variable, requireStylesheet, elementStyle } from "../src/styling";
+import { Styles } from "../src/types";
 
 const sourceUrl = '\n/*# sourceURL=stylemap.css */';
 
@@ -52,7 +53,46 @@ test("keyframes added to stylesheet", () => {
 }${sourceUrl}`)
 });
 
-test("rules returns rules", () => {
+test("elementStyle returns evaluated properties", () => {
+    let result = elementStyle({
+        width: 1,
+        padding: [1, 2, 3, 4],
+        animation: { animationName: 'test', animationDuration: 1 }
+    });
+
+    expect(result.width).toEqual('1px');
+    expect(result.padding).toEqual('1px 2px 3px 4px');
+    expect(result.animation).toEqual('test 1ms ease 0ms 1 normal none running');
+});
+
+test("elementStyle toString returns style", () => {
+    let result = elementStyle({
+        width: 1,
+        padding: [1, 2, 3, 4],
+        animation: { animationName: 'test', animationDuration: 1 }
+    });
+
+    expect(result.toString()).toEqual('width: 1px; padding: 1px 2px 3px 4px; animation: test 1ms ease 0ms 1 normal none running;');
+});
+
+test("elementStyle warns about nested styles", () => {
+    console.warn = jest.fn();
+
+    elementStyle({ ':hover': { width: 1 } } as Styles);
+    expect(console.warn).toBeCalledWith('Cannot put nested properties in an element style:', expect.arrayContaining([['&:hover', { width: 1 }]]));
+
+    elementStyle({ $: { '.nested': { height: 2 } } } as Styles);
+    expect(console.warn).toBeCalledWith('Cannot put nested properties in an element style:', expect.arrayContaining([['.nested', { height: 2 }]]));
+});
+
+test("elementStyle warns about inline keyframes", () => {
+    console.warn = jest.fn();
+
+    elementStyle({ animation: { keyframes: { from: { width: 1 }, to: { width: 2 } } } });
+    expect(console.warn).toBeCalledWith('Cannot put keyframes inline in an element style:', expect.arrayContaining([['inline-animation-0', { from: { width: 1 }, to: { width: 2 } }]]));
+});
+
+test("cssRules returns rules", () => {
     let styles = { '.test': { width: 1 } };
     expect(cssRules(styles)).toEqual(styles);
 });

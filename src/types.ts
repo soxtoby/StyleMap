@@ -1,7 +1,6 @@
 import * as CSS from 'csstype';
 import { RegisteredStyle } from './styling';
 
-type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 type Overwrite<T, U> = Omit<T, keyof T & keyof U> & U;
 type Defined<T> = Exclude<T, undefined>;
 type AllowMultiple<T, TKeys extends keyof T> = { [K in keyof T]: K extends TKeys ? T[K] | Defined<T[K]>[] : T[K]; };
@@ -116,6 +115,8 @@ export interface RegisteredStyles extends Styles, Registered {
     toString(): string;
 }
 
+export type ElementStyle = CSS.Properties<string>;
+
 export interface Rules {
     [selector: string]: Styles;
 }
@@ -133,7 +134,7 @@ export type AnimationDefinition = Pick<VariableProperties,
     | 'animationDirection'
     | 'animationFillMode'
     | 'animationPlayState'>
-    & { keyframes: KeyFrames };
+    & { keyframes?: KeyFrames };
 
 export interface TransformFunctions {
     matrix?: string | [number, number, number, number, number, number];

@@ -1,6 +1,6 @@
 import * as CSS from 'csstype';
-import { css, cssPropertyValue, fontFaceCss, keyframesCss } from "./css";
-import { AnimationDefinition, CSSProperties, FontFaceDefinition, KeyFrames, PropertyType, RegisteredStyles, Rules, StyleCollection, Styles, Variable, Registered } from "./types";
+import { css, cssPropertyValue, fontFaceCss, keyframesCss, splitProperties, cssProperties } from "./css";
+import { AnimationDefinition, CSSProperties, FontFaceDefinition, KeyFrames, PropertyType, RegisteredStyles, Rules, StyleCollection, Styles, Variable, Registered, ElementStyle } from "./types";
 
 let registeredFontFaces = [] as FontFaceDefinition[];
 let registeredRules = [] as Rules[];
@@ -10,6 +10,20 @@ let registeredVariables = [] as Variable<any>[];
 let stylesheetRequired = true;
 export let stylesheet: HTMLStyleElement;
 export const RegisteredStyle = Symbol('StyleRendered');
+
+export function elementStyle(styles: CSSProperties): ElementStyle {
+    let { properties, nested, keyframes } = splitProperties(styles);
+
+    if (nested.length)
+        console.warn('Cannot put nested properties in an element style:', nested);
+
+    if (keyframes.length)
+        console.warn('Cannot put keyframes inline in an element style:', keyframes);
+
+    let elementStyle = {} as any;
+    properties.forEach(([property, value]) => elementStyle[property] = cssPropertyValue(property, value));
+    return withToString(elementStyle, () => cssProperties(properties));
+}
 
 export function style(name: string, styles: Styles): RegisteredStyles {
     name = register(registeredStyles, name, styles as RegisteredStyles);
@@ -49,9 +63,9 @@ export function animation(...args: any[]) {
     return { animationName: registeredName || animationName, keyframes, animationDuration, animationTimingFunction, animationDelay, animationIterationCount, animationDirection, animationFillMode, animationPlayState };
 }
 
-export function variable<T extends keyof CSSProperties>(property: T, name?: string): Variable<T> {
+export function variable<T extends keyof CSSProperties & string>(property: T, name?: string): Variable<T> {
     let varName = `--${name || property}-${registeredVariables.length}`;
-    let variable = createVariable<T>(varName, property!);
+    let variable = createVariable<T>(varName, property);
     registeredVariables.push(variable);
     return variable;
 }
