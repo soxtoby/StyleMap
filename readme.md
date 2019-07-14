@@ -13,7 +13,7 @@ Style some elements!
 ```tsx
 import { styles, updateStylesheet, classes } from 'stylemap';
 
-let hotPinkText = style({ color: '#FF69B4' });
+let hotPinkText = style('hotPink', { color: '#FF69B4' });
 
 updateStylesheet();
 
@@ -28,14 +28,14 @@ Styles are created by passing a name and `Styles` object into the `style` functi
 ```ts
 let myStyle = style('style-name', { color: 'red' });
 ```
-Note that the name will have a number appended to it to create the CSS class name (see below for more detail).
+Note that the name will have a number appended to it to create the CSS class name ([see below](#generated-names) for more detail).
 
 StyleMap comes with TypeScript types, so you'll get autocomplete and type information when building the `Styles` object passed into `style`.
 
 Property names are camel case (e.g. `paddingTop`), and will be converted to snake case in CSS (e.g. `padding-top`). Vendor-specific properties are pascal case (e.g. `MozTabSize`) and are converted to snake case with a leading dash (e.g. `-moz-tab-size`).
 
 ### Property Types
-All CSS properties accept a string, but some properties also accept a number, which will automatically be converted to a default unit (usually `px`, see below for more detail).
+All CSS properties accept a string, but some properties also accept a number, which will automatically be converted to a default unit (usually `px`, [see below](#overriding-defaults) for more detail).
 
 ### Pseudo Class/Element Selectors
 Basic pseudo class and element selectors can be included in a `Styles` object and will be appended to the parent selector to create a new CSS rule.
@@ -54,11 +54,15 @@ More complex selectors can be created using the nesting property, `$`. By defaul
 
 Code:
 ```ts
-style('parent', { $: { 'input': { background: 'white' } } });
+style('parent', { $: {
+    'input': { background: 'white' },
+    '> label': { color: 'black' }
+} });
 ```
 CSS:
 ```css
 .parent-0 input { background: white; }
+.parent-0 > label { color: black; }
 ```
 
 Selectors with `&` in them will instead have their `&`s replaced with the parent selector.
@@ -130,7 +134,18 @@ let condition = false;
 classes([style1, [style2, undefinedStyle]]); // Returns e.g. 'red-0 blue-1'
 classes([style1, condition && style2]); // Returns e.g. 'red-0`
 ```
-If any of the styles passed in to `classes` has not yet been rendered to the stylesheet, it will throw an error to prevent you from using styles that won't show up.
+If any of the styles passed in to `classes` have not yet been rendered to the stylesheet, it will throw an error to prevent you from using styles that won't show up.
+
+### Inline Element Styles
+StyleMap styles can be converted to more standard CSS style objects with the `elementStyle` function.
+These objects can be passed directly to a React style prop, or `toString`'d for use as an element's style attribute.
+```ts
+// Returns { width: '100px', padding: '2px 4px' }
+let inlineStyle = elementStyle({ width: 100, padding: [2, 4] });
+// toString returns 'width: 100px; padding: 2px 4px;'
+element.style = inlineStyle.toString();
+```
+Note that nested selectors/styles, and inline animation keyframes are not supported by `elementStyle`.
 
 ### Style References
 To reference one style from another style, you can use template strings:
@@ -147,7 +162,7 @@ CSS:
 .inner-0 { border: 1px solid red; }
 .outer-1 .inner-0 { border-color: green; }
 ```
-Note the `.` before `${style1}`, as a style's `toString()` returns just the class name.
+Note the `.` before `${style1}`, as a style's `toString()` only returns the class name.
 
 ### Mixins
 The `style` function returns an object, which makes it easy to mix-in with other styles:
@@ -248,7 +263,7 @@ style('special-text': { fontFamily: myFont.fontFamily });
 ```
 
 ## CSS Variables
-Since style are declared statically, CSS variables are indispensable for dynamic styling. StyleMap variables provide type-safety and default units by specifying the CSS property they will be used for.
+Since styles are declared statically, CSS variables are indispensable for dynamic styling. StyleMap variables provide type-safety and default units by specifying the CSS property they will be used for.
 
 First declare the variable:
 ```ts
@@ -265,3 +280,16 @@ cssRules({ '::global': { ...dynamicColor.set('red') } });
 <div style={{ ...dynamicColor.set('blue') }} />
 ```
 (once again, this example uses React, but you can use whatever you like)
+
+## Generated Names
+All generated class, keyframe, and variable names have a hyphenated index appended to their names. This provides the following benefits:
+- Avoids conflicts with CSS from outside StyleMap.
+- Ensures that names are unique, even if the same name is used more than once.
+- Indicates the order that styles were registered, which helps when debugging overridden properties.
+
+## Overriding Defaults
+StyleMap exposes a `propertyDefaults` object, which is a map of property name to adjustment function. These adjustment functions are applied to property values to convert them to CSS strings, and can be used to provide default values, default units, or potentially other conversions. If a property isn't specified in `popertyDefaults`, the default behavior is to convert numbers to `px`.
+
+StyleMap also exposes a `functionDefaults` object, which is a map of function name to adjustment function. These adjustment functions work similarly to property adjustment functions, but are applied to function arguments, when used in [function objects](#css-functions).
+
+If you want to override any default values or units, you can used the provided `defaultValue`, `defaultUnit`, and `defaultUnitAndValue` functions.
