@@ -32,7 +32,7 @@ Note that the name will have a number appended to it to create the CSS class nam
 
 StyleMap comes with TypeScript types, so you'll get autocomplete and type information when building the `Styles` object passed into `style`.
 
-Property names are camel case (e.g. `paddingTop`), and will be converted to snake case in CSS (e.g. `padding-top`). Vendor-specific properties are pascal case (e.g. `MozTabSize`) and are converted to snake case with a leading dash (e.g. `-moz-tab-size`).
+Property names are camel case (e.g. `paddingTop`), and will be converted to kebab case in CSS (e.g. `padding-top`). Vendor-specific properties are pascal case (e.g. `MozTabSize`) and are converted to kebab case with a leading dash (e.g. `-moz-tab-size`).
 
 ### Property Types
 All CSS properties accept a string, but some properties also accept a number, which will automatically be converted to a default unit (usually `px`, [see below](#overriding-defaults) for more detail).

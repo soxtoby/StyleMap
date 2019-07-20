@@ -104,7 +104,7 @@ function baseRule(selector: string, styles: [string, any][]) {
 export function cssProperties(styles: [string, any][]) {
     return styles
         .filter(([, value]) => typeof value != 'undefined')
-        .map(([property, value]) => `${snakeCase(property)}: ${cssPropertyValue(property, value)};`)
+        .map(([property, value]) => `${kebabCase(property)}: ${cssPropertyValue(property, value)};`)
         .join(' ');
 }
 
@@ -116,7 +116,7 @@ export function cssPropertyValue(property: string, value: any): string | undefin
 
 function cssFunctions(property: string, functionMap: object) {
     return Object.entries(functionMap)
-        .map(([fn, value]) => `${functionSnakeCase(fn)}(${cssFunctionValue(property, fn, value)})`)
+        .map(([fn, value]) => `${functionKebabCase(fn)}(${cssFunctionValue(property, fn, value)})`)
         .join(' ');
 }
 
@@ -128,11 +128,11 @@ function cssFunctionValue(property: string, fn: string, value: any): string {
         : cssPropertyValue(property, value)!;
 }
 
-function snakeCase(name: string) {
+function kebabCase(name: string) {
     return name.replace(/[A-Z]/g, capital => `-${capital.toLowerCase()}`);
 }
 
-function functionSnakeCase(name: string) {
+function functionKebabCase(name: string) {
     return name.replace(/[A-Z](?!$)/g, capital => `-${capital.toLowerCase()}`);
 }
 
