@@ -109,9 +109,24 @@ export function cssProperties(styles: [string, any][]) {
 }
 
 export function cssPropertyValue(property: string, value: any): string | undefined {
-    return Array.isArray(value) ? value.map(v => cssPropertyValue(property, v)).join(spaceSeparatedValueProperties.includes(property) ? ' ' : ', ')
+    return Array.isArray(value) ? arrayValues(property, value)
         : typeof value == 'object' ? cssFunctions(property, value)
             : (propertyDefaults[property as keyof CSS.Properties] || defaultUnit('px'))(value);
+}
+
+function arrayValues(property: string, values: any[]): string | undefined {
+    let separators = propertySeparators[property as keyof CSS.Properties] || [', '];
+    let nested = false;
+
+    return values
+        .map(v => {
+            if (Array.isArray(v)) {
+                nested = true; // Assuming maximum of 2 levels for now
+                return v.map(v2 => cssPropertyValue(property, v2)).join(separators[0])
+            }
+            return cssPropertyValue(property, v)
+        })
+        .join(separators[Math.min(nested ? 1 : 0, separators.length - 1)]);
 }
 
 function cssFunctions(property: string, functionMap: object) {
@@ -122,9 +137,17 @@ function cssFunctions(property: string, functionMap: object) {
 
 function cssFunctionValue(property: string, fn: string, value: any): string {
     if (Array.isArray(value))
-        return value.map(v => cssFunctionValue(property, fn, v)).join(', ');
+        return value.map((v, i) => cssFunctionParameterValue(property, fn, v, i)).join(', ');
+    return cssFunctionParameterValue(property, fn, value, 0);
+}
+
+function cssFunctionParameterValue(property: string, fn: string, value: any, parameterIndex: number): string {
+    if (Array.isArray(value))
+        return value.map(v => cssFunctionParameterValue(property, fn, v, parameterIndex)).join(' ');
+    if (typeof value == 'object')
+        return cssFunctions(property, value);
     return fn in functionDefaults
-        ? functionDefaults[fn](value)
+        ? functionDefaults[fn][Math.min(parameterIndex, functionDefaults[fn].length - 1)](value)
         : cssPropertyValue(property, value)!;
 }
 
@@ -149,6 +172,8 @@ export const propertyDefaults: { [property in keyof CSS.Properties]?: (value: an
     flexGrow: defaultUnit(''),
     flexShrink: defaultUnit(''),
     fontWeight: defaultUnit(''),
+    gridColumn: defaultUnit(''),
+    gridRow: defaultUnit(''),
     lineHeight: defaultUnit(''),
     opacity: defaultUnit(''),
     transitionDuration: defaultUnit('ms'),
@@ -156,30 +181,37 @@ export const propertyDefaults: { [property in keyof CSS.Properties]?: (value: an
     zIndex: defaultUnit('')
 };
 
-export const functionDefaults: { [cssFunction: string]: (value: any) => string } = {
-    matrix: defaultUnit(''),
-    matrix3d: defaultUnit(''),
-    rotate: defaultUnit('deg'),
-    rotateX: defaultUnit('deg'),
-    rotateY: defaultUnit('deg'),
-    rotateZ: defaultUnit('deg'),
-    rotate3d: defaultUnit(''),
-    scale: defaultUnit(''),
-    scaleX: defaultUnit(''),
-    scaleY: defaultUnit(''),
-    scaleZ: defaultUnit(''),
-    scale3d: defaultUnit(''),
-    skew: defaultUnit('deg'),
-    skewX: defaultUnit('deg'),
-    skewY: defaultUnit('deg')
+export const functionDefaults: { [cssFunction: string]: ((value: any) => string)[] } = {
+    matrix: [defaultUnit('')],
+    matrix3d: [defaultUnit('')],
+    repeat: [defaultUnit(''), defaultUnit('px')],
+    rotate: [defaultUnit('deg')],
+    rotateX: [defaultUnit('deg')],
+    rotateY: [defaultUnit('deg')],
+    rotateZ: [defaultUnit('deg')],
+    rotate3d: [defaultUnit(''), defaultUnit(''), defaultUnit(''), defaultUnit('deg')],
+    scale: [defaultUnit('')],
+    scaleX: [defaultUnit('')],
+    scaleY: [defaultUnit('')],
+    scaleZ: [defaultUnit('')],
+    scale3d: [defaultUnit('')],
+    skew: [defaultUnit('deg')],
+    skewX: [defaultUnit('deg')],
+    skewY: [defaultUnit('deg')]
 };
 
-export const spaceSeparatedValueProperties = [
-    'borderColor',
-    'borderRadius',
-    'borderStyle',
-    'borderWidth',
-    'margin',
-    'padding',
-    'transform'
-];
+export const propertySeparators: { [property in keyof CSS.Properties]?: string[] } = {
+    borderColor: [' '],
+    borderRadius: [' '],
+    borderStyle: [' '],
+    borderWidth: [' '],
+    gridColumn: [' / '],
+    gridRow: [' / '],
+    gridTemplate: [' ', ' / '],
+    gridTemplateAreas: [' '],
+    gridTemplateColumns: [' '],
+    gridTemplateRows: [' '],
+    margin: [' '],
+    padding: [' '],
+    transform: [' '],
+};

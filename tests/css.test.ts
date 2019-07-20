@@ -17,6 +17,8 @@ test("basic properties", () => {
 test("basic properties with multiple values", () => {
     expect(css({ '.test': { transitionProperty: ['width', 'height'] } })).toBe('.test { transition-property: width, height; }');
     expect(css({ '.test': { margin: [1, '2em'] } })).toBe('.test { margin: 1px 2em; }');
+    expect(css({ '.test': { gridTemplate: [1, 2] } })).toBe('.test { grid-template: 1px 2px; }');
+    expect(css({ '.test': { gridTemplate: ['max-content', [1, 2]] } })).toBe('.test { grid-template: max-content / 1px 2px; }');
 });
 
 test("top-level at-rules", () => {
@@ -217,6 +219,9 @@ test("functions", () => {
     expect(css({ '.test': { transform: { scaleX: 2 } } }))
         .toBe('.test { transform: scaleX(2); }');
 
-    expect(css({ '.test': { transform: { rotate3d: [1, 2, 3, '4deg'], skew: 5 } } }))
+    expect(css({ '.test': { transform: { rotate3d: [1, 2, 3, 4], skew: 5 } } }))
         .toBe('.test { transform: rotate3d(1, 2, 3, 4deg) skew(5deg); }');
+
+    expect(css({ '.test': { gridTemplateRows: { repeat: [1, [2, { minmax: [3, 4] }]] } } }))
+        .toBe('.test { grid-template-rows: repeat(1, 2px minmax(3px, 4px)); }');
 });

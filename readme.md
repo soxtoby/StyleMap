@@ -110,7 +110,7 @@ CSS:
 ### CSS Functions
 Some properties allow specifying the value as an object with CSS functions for the property names. E.g.
 ```ts
-style('squeeze', { transform: { scale: 0.8, rotate: '30deg' } });
+style('squeeze', { transform: { scale: 0.8, rotate: 30 } });
 ```
 CSS:
 ```css

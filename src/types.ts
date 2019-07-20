@@ -14,6 +14,11 @@ type ExtendedProperties = Overwrite<BaseProperties, {
     animationDelay?: CSS.GlobalsString | number;
     background?: CSS.BackgroundProperty<TLength> | BackgroundImageFunctions;
     backgroundImage?: CSS.BackgroundProperty<TLength> | BackgroundImageFunctions;
+    gridAutoColumns?: CSS.GridAutoColumnsProperty<TLength> | GridBreadthFunctions;
+    gridAutoRows?: CSS.GridAutoRowsProperty<TLength> | GridBreadthFunctions;
+    gridTemplate?: ExtendedProperties['gridTemplateRows'] | ExtendedProperties['gridTemplateRows'][];
+    gridTemplateColumns?: CSS.GridTemplateColumnsProperty<TLength> | GridTemplateFunctions;
+    gridTemplateRows?: CSS.GridTemplateRowsProperty<TLength> | GridTemplateFunctions;
     transitionDuration?: CSS.GlobalsString | number;
     transitionDelay?: CSS.GlobalsString | number;
     transform?: CSS.TransformProperty | TransformFunctions;
@@ -48,6 +53,14 @@ type MultiValueProperties = AllowMultiple<VariableProperties,
     | 'boxShadow'
     | 'fontFamily'
     | 'fontFeatureSettings'
+    | 'grid'
+    | 'gridArea'
+    | 'gridColumn'
+    | 'gridRow'
+    | 'gridTemplate'
+    | 'gridTemplateAreas'
+    | 'gridTemplateColumns'
+    | 'gridTemplateRows'
     | 'margin'
     | 'padding'
     | 'textShadow'
@@ -167,6 +180,14 @@ export interface BackgroundImageFunctions {
     conicGradient?: string | (string | CSS.Color)[];
     repeatingLinearGradient?: string | (string | CSS.Color)[];
     repeatingRadialGradient?: string | (string | CSS.Color)[];
+}
+
+export interface GridBreadthFunctions {
+    minmax?: [CSS.GridAutoRowsProperty<TLength>, CSS.GridAutoRowsProperty<TLength>];
+}
+
+export interface GridTemplateFunctions extends GridBreadthFunctions {
+    repeat?: [number | 'auto-fill' | 'auto-fit', ExtendedProperties['gridAutoRows'] | ExtendedProperties['gridAutoRows'][]];
 }
 
 export type FontFaceDefinition = Overwrite<CSS.FontFace, {
