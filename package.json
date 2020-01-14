@@ -1,6 +1,6 @@
 {
   "name": "stylemap",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "CSS in JS/TS",
   "main": "lib/index.js",
   "types": "lib/index",

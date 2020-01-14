@@ -44,6 +44,7 @@ export function splitProperties(styles: Styles, selector: string = 'inline') {
     let keyframes = [] as [string, KeyFrames][];
 
     Object.entries(styles)
+        .filter(([, value]) => typeof value != 'undefined')
         .forEach(([key, value]) => {
             if (key == '$')
                 nested = nested.concat(Object.entries(value));
@@ -103,7 +104,6 @@ function baseRule(selector: string, styles: [string, any][]) {
 
 export function cssProperties(styles: [string, any][]) {
     return styles
-        .filter(([, value]) => typeof value != 'undefined')
         .map(([property, value]) => `${kebabCase(property)}: ${cssPropertyValue(property, value)};`)
         .join(' ');
 }
