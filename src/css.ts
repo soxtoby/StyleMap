@@ -4,7 +4,7 @@ import { AnimationDefinition, FontFaceDefinition, KeyFrames, Rules, Styles } fro
 import { defaultUnit, defaultUnitAndValue, defaultValue } from "./utils";
 
 export function css(rules: Rules) {
-    return ruleSet('', Object.entries(rules))
+    return ruleSet('', ruleEntries(rules))
         .join('\n');
 }
 
@@ -40,14 +40,14 @@ function styleRules(selector: string, styles: Styles) {
 
 export function splitProperties(styles: Styles, selector: string = 'inline') {
     let properties = [] as [string, any][];
-    let nested = [] as [string, Styles][];
+    let nested = [] as ([string, Styles])[];
     let keyframes = [] as [string, KeyFrames][];
 
     Object.entries(styles)
         .filter(([, value]) => typeof value != 'undefined')
         .forEach(([key, value]) => {
             if (key == '$')
-                nested = nested.concat(Object.entries(value));
+                nested = nested.concat(ruleEntries(value));
             else if (key[0] == ':')
                 nested.push([`&${key}`, value]);
             else if (key == 'animation') {
@@ -59,6 +59,14 @@ export function splitProperties(styles: Styles, selector: string = 'inline') {
         });
 
     return { properties, nested, keyframes };
+}
+
+function ruleEntries(rules: Rules) {
+    return Array.isArray(rules)
+        ? rules.flatMap(([selector, styles]) => Array.isArray(selector)
+            ? selector.map(s => [s, styles] as [string, Styles])
+            : [[selector, styles] as [string, Styles]])
+        : Object.entries(rules);
 }
 
 function animationValues(value: CSS.AnimationProperty | AnimationDefinition, selector: string) {

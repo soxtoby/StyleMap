@@ -9,7 +9,7 @@
         "declaration": true,
         "outDir": "lib",
         "lib": [
-            "es2017",
+            "es2019",
             "dom"
         ]
     },

@@ -14,6 +14,13 @@ test("basic properties", () => {
     expect(css({ '.test': { overflowX: 'auto' } })).toBe(`.test { overflow-x: auto; }`);
 });
 
+test("arrays of rules", () => {
+    expect(css([['.test', { background: 'blue' }]])).toBe(`.test { background: blue; }`);
+    expect(css([[['.foo', '.bar'], { width: 1 }]])).toBe(
+        `.foo { width: 1px; }\n`
+        + `.bar { width: 1px; }`);
+});
+
 test("basic properties with multiple values", () => {
     expect(css({ '.test': { transitionProperty: ['width', 'height'] } })).toBe('.test { transition-property: width, height; }');
     expect(css({ '.test': { margin: [1, '2em'] } })).toBe('.test { margin: 1px 2em; }');
@@ -49,6 +56,26 @@ test("nested styles", () => {
 
     expect(css({ '.test': { $: { 'input&': { width: 1 } } } }))
         .toBe(`input.test { width: 1px; }`);
+
+    expect(css({ '.test': { $: [['input', { width: 1 }]] } }))
+        .toBe(`.test input { width: 1px; }`);
+
+    expect(css({ '.test': { $: [[['input', 'button'], { width: 1 }]] } })).toBe(
+        `.test input { width: 1px; }\n`
+        + `.test button { width: 1px; }`);
+
+    expect(css([
+        [['.foo', '.bar'], {
+            $: [
+                [['.baz', '.qux'], { width: 1 }]
+            ]
+        }]
+    ])).toBe(
+        `.foo .baz { width: 1px; }\n`
+        + `.foo .qux { width: 1px; }\n`
+        + `.bar .baz { width: 1px; }\n`
+        + `.bar .qux { width: 1px; }`
+    );
 });
 
 test("multiple rules", () => {

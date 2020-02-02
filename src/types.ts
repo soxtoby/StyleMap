@@ -130,9 +130,9 @@ export interface RegisteredStyles extends Styles, Registered {
 
 export type ElementStyle = CSS.Properties<string>;
 
-export interface Rules {
-    [selector: string]: Styles;
-}
+export type Rules = { [selector: string]: Styles } | [Selector, Styles][];
+
+export type Selector = string | string[];
 
 export type StyleCollection = RegisteredStyles | StyleCollectionArray | undefined | false;
 
