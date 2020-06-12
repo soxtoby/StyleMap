@@ -14,6 +14,12 @@ test("basic properties", () => {
     expect(css({ '.test': { overflowX: 'auto' } })).toBe(`.test { overflow-x: auto; }`);
 });
 
+test("vendor prefixes", () => {
+    expect(css({ '.test': { WebkitAlignSelf: 'start' } })).toBe(`.test { -webkit-align-self: start; }`);
+    expect(css({ '.test': { MozBoxAlign: 'start' } })).toBe(`.test { -moz-box-align: start; }`);
+    expect(css({ '.test': { msAlignSelf: 'start' } })).toBe(`.test { -ms-align-self: start; }`);
+});
+
 test("arrays of rules", () => {
     expect(css([['.test', { background: 'blue' }]])).toBe(`.test { background: blue; }`);
     expect(css([[['.foo', '.bar'], { width: 1 }]])).toBe(

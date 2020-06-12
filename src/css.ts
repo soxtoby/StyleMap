@@ -160,7 +160,9 @@ function cssFunctionParameterValue(property: string, fn: string, value: any, par
 }
 
 function kebabCase(name: string) {
-    return name.replace(/[A-Z]/g, capital => `-${capital.toLowerCase()}`);
+    return name
+        .replace(/^ms(?=[A-Z])/, '-ms') // The MS properties are lowercase, so need to handle them specially
+        .replace(/[A-Z]/g, capital => `-${capital.toLowerCase()}`);
 }
 
 function functionKebabCase(name: string) {
