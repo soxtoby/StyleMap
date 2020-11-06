@@ -77,14 +77,20 @@ function animationValues(value: Property.Animation | AnimationDefinition, select
 }
 
 function singleAnimation(animation: Property.Animation | AnimationDefinition, selector: string, index = 0): { value: string, keyframes: [string, KeyFrames][] } {
-    if (typeof animation == 'object') {
+    if (isAnimationDefinition(animation)) {
         if (!animation.keyframes || RegisteredStyle in animation.keyframes)
             return { value: animationFromDefinition(animation), keyframes: [] };
 
         let animationName = inlineAnimationName(animation.animationName, selector, index);
         return { value: animationFromDefinition({ ...animation, animationName }), keyframes: [[animationName, animation.keyframes]] };
     }
+
     return { value: animation as string, keyframes: [] };
+
+    function isAnimationDefinition(animation: Property.Animation | AnimationDefinition): animation is AnimationDefinition {
+        return typeof animation == 'object'
+            && !!Object.keys(animation);
+    }
 }
 
 function animationFromDefinition(def: AnimationDefinition) {
