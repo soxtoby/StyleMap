@@ -131,7 +131,7 @@ function ensureStylesheet() {
 }
 
 export function resetStyles() {
-    registeredStyles.forEach(([, s]) => delete s[RegisteredStyle]);
+    registeredStyles.forEach(([, s]) => delete (s as any)[RegisteredStyle]);
     registeredFontFaces = [];
     registeredStyles = [];
     registeredRules = [];
