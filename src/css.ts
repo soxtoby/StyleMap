@@ -88,8 +88,7 @@ function singleAnimation(animation: Property.Animation | AnimationDefinition, se
     return { value: animation as string, keyframes: [] };
 
     function isAnimationDefinition(animation: Property.Animation | AnimationDefinition): animation is AnimationDefinition {
-        return typeof animation == 'object'
-            && !!Object.keys(animation);
+        return typeof animation == 'object';
     }
 }
 
