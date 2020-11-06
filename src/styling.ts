@@ -1,4 +1,4 @@
-import * as CSS from 'csstype';
+import { Property } from "csstype";
 import { css, cssPropertyValue, fontFaceCss, keyframesCss, splitProperties, cssProperties } from "./css";
 import { AnimationDefinition, CSSProperties, FontFaceDefinition, KeyFrames, PropertyType, RegisteredStyles, Rules, StyleCollection, Styles, Variable, Registered, ElementStyle } from "./types";
 
@@ -50,8 +50,8 @@ export function fontFace(definition: FontFaceDefinition): FontFaceDefinition {
     return withToString(definition, () => definition.fontFamily);
 }
 
-export function animation(keyframes: KeyFrames, duration?: number | string, timing?: CSS.AnimationTimingFunctionProperty, delay?: number | string, iterationCount?: CSS.AnimationIterationCountProperty, direction?: CSS.AnimationDirectionProperty, fillMode?: CSS.AnimationFillModeProperty, playState?: CSS.AnimationPlayStateProperty): AnimationDefinition;
-export function animation(name: string, keyframes: KeyFrames, duration?: number | string, timing?: CSS.AnimationTimingFunctionProperty, delay?: number | string, iterationCount?: CSS.AnimationIterationCountProperty, direction?: CSS.AnimationDirectionProperty, fillMode?: CSS.AnimationFillModeProperty, playState?: CSS.AnimationPlayStateProperty): AnimationDefinition;
+export function animation(keyframes: KeyFrames, duration?: number | string, timing?: Property.AnimationTimingFunction, delay?: number | string, iterationCount?: Property.AnimationIterationCount, direction?: Property.AnimationDirection, fillMode?: Property.AnimationFillMode, playState?: Property.AnimationPlayState): AnimationDefinition;
+export function animation(name: string, keyframes: KeyFrames, duration?: number | string, timing?: Property.AnimationTimingFunction, delay?: number | string, iterationCount?: Property.AnimationIterationCount, direction?: Property.AnimationDirection, fillMode?: Property.AnimationFillMode, playState?: Property.AnimationPlayState): AnimationDefinition;
 export function animation(...args: any[]) {
     let registeredName: string | undefined;
     if (typeof args[0] == 'object')
