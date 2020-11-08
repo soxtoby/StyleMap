@@ -1,4 +1,4 @@
-import * as CSS from 'csstype';
+import { Properties, Property, AtRule } from 'csstype';
 import { RegisteredStyle } from './styling';
 
 type Overwrite<T, U> = Omit<T, keyof T & keyof U> & U;
@@ -7,21 +7,21 @@ type AllowMultiple<T, TKeys extends keyof T> = { [K in keyof T]: K extends TKeys
 
 export type TLength = string | number;
 
-type BaseProperties = CSS.Properties<TLength>;
+type BaseProperties = Properties<TLength>;
 type ExtendedProperties = Overwrite<BaseProperties, {
-    animation?: CSS.AnimationProperty | AnimationDefinition;
-    animationDuration?: CSS.GlobalsString | number;
-    animationDelay?: CSS.GlobalsString | number;
-    background?: CSS.BackgroundProperty<TLength> | BackgroundImageFunctions;
-    backgroundImage?: CSS.BackgroundProperty<TLength> | BackgroundImageFunctions;
-    gridAutoColumns?: CSS.GridAutoColumnsProperty<TLength> | GridBreadthFunctions;
-    gridAutoRows?: CSS.GridAutoRowsProperty<TLength> | GridBreadthFunctions;
+    animation?: Property.Animation | AnimationDefinition;
+    animationDuration?: Property.AnimationDuration | number;
+    animationDelay?: Property.AnimationDelay | number;
+    background?: Property.Background<TLength> | BackgroundImageFunctions;
+    backgroundImage?: Property.Background<TLength> | BackgroundImageFunctions;
+    gridAutoColumns?: Property.GridAutoColumns<TLength> | GridBreadthFunctions;
+    gridAutoRows?: Property.GridAutoRows<TLength> | GridBreadthFunctions;
     gridTemplate?: ExtendedProperties['gridTemplateRows'] | ExtendedProperties['gridTemplateRows'][];
-    gridTemplateColumns?: CSS.GridTemplateColumnsProperty<TLength> | GridTemplateFunctions;
-    gridTemplateRows?: CSS.GridTemplateRowsProperty<TLength> | GridTemplateFunctions;
-    transitionDuration?: CSS.GlobalsString | number;
-    transitionDelay?: CSS.GlobalsString | number;
-    transform?: CSS.TransformProperty | TransformFunctions;
+    gridTemplateColumns?: Property.GridTemplateColumns<TLength> | GridTemplateFunctions;
+    gridTemplateRows?: Property.GridTemplateRows<TLength> | GridTemplateFunctions;
+    transitionDuration?: Property.TransitionDelay | number;
+    transitionDelay?: Property.TransitionDelay | number;
+    transform?: Property.Transform | TransformFunctions;
 }>;
 type VariableProperties = { [K in keyof ExtendedProperties]: ExtendedProperties[K] | VariableOfType<PropertyType<K>>; }
 type MultiValueProperties = AllowMultiple<VariableProperties,
@@ -128,7 +128,7 @@ export interface RegisteredStyles extends Styles, Registered {
     toString(): string;
 }
 
-export type ElementStyle = CSS.Properties<string>;
+export type ElementStyle = Properties<string>;
 
 export type Rules = { [selector: string]: Styles } | [Selector, Styles][];
 
@@ -175,22 +175,22 @@ export interface TransformFunctions {
 
 export interface BackgroundImageFunctions {
     url?: string;
-    linearGradient?: string | (string | CSS.Color)[];
-    radialGradient?: string | (string | CSS.Color)[];
-    conicGradient?: string | (string | CSS.Color)[];
-    repeatingLinearGradient?: string | (string | CSS.Color)[];
-    repeatingRadialGradient?: string | (string | CSS.Color)[];
+    linearGradient?: string | (string | Property.Color)[];
+    radialGradient?: string | (string | Property.Color)[];
+    conicGradient?: string | (string | Property.Color)[];
+    repeatingLinearGradient?: string | (string | Property.Color)[];
+    repeatingRadialGradient?: string | (string | Property.Color)[];
 }
 
 export interface GridBreadthFunctions {
-    minmax?: [CSS.GridAutoRowsProperty<TLength>, CSS.GridAutoRowsProperty<TLength>];
+    minmax?: [Property.GridAutoRows<TLength>, Property.GridAutoRows<TLength>];
 }
 
 export interface GridTemplateFunctions extends GridBreadthFunctions {
     repeat?: [number | 'auto-fill' | 'auto-fit', ExtendedProperties['gridAutoRows'] | ExtendedProperties['gridAutoRows'][]];
 }
 
-export type FontFaceDefinition = Overwrite<CSS.FontFace, {
+export type FontFaceDefinition = Overwrite<AtRule.FontFace, {
     fontFamily: string;
     src: FontFaceSrc | FontFaceSrc[]
 }>;

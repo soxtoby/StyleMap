@@ -1,4 +1,4 @@
-import * as CSS from 'csstype';
+import { Properties, Property } from "csstype";
 import { RegisteredStyle } from './styling';
 import { AnimationDefinition, FontFaceDefinition, KeyFrames, Rules, Styles } from "./types";
 import { defaultUnit, defaultUnitAndValue, defaultValue } from "./utils";
@@ -69,22 +69,27 @@ function ruleEntries(rules: Rules) {
         : Object.entries(rules);
 }
 
-function animationValues(value: CSS.AnimationProperty | AnimationDefinition, selector: string) {
+function animationValues(value: Property.Animation | AnimationDefinition, selector: string) {
     return Array.isArray(value)
         ? value.map((v, i) => singleAnimation(v, selector, i))
             .reduce((a, b) => ({ value: `${a.value}, ${b.value}`, keyframes: a.keyframes.concat(b.keyframes) }))
         : singleAnimation(value, selector);
 }
 
-function singleAnimation(animation: CSS.AnimationProperty | AnimationDefinition, selector: string, index = 0): { value: string, keyframes: [string, KeyFrames][] } {
-    if (typeof animation == 'object') {
+function singleAnimation(animation: Property.Animation | AnimationDefinition, selector: string, index = 0): { value: string, keyframes: [string, KeyFrames][] } {
+    if (isAnimationDefinition(animation)) {
         if (!animation.keyframes || RegisteredStyle in animation.keyframes)
             return { value: animationFromDefinition(animation), keyframes: [] };
 
         let animationName = inlineAnimationName(animation.animationName, selector, index);
         return { value: animationFromDefinition({ ...animation, animationName }), keyframes: [[animationName, animation.keyframes]] };
     }
+
     return { value: animation as string, keyframes: [] };
+
+    function isAnimationDefinition(animation: Property.Animation | AnimationDefinition): animation is AnimationDefinition {
+        return typeof animation == 'object';
+    }
 }
 
 function animationFromDefinition(def: AnimationDefinition) {
@@ -119,11 +124,11 @@ export function cssProperties(styles: [string, any][]) {
 export function cssPropertyValue(property: string, value: any): string | undefined {
     return Array.isArray(value) ? arrayValues(property, value)
         : typeof value == 'object' ? cssFunctions(property, value)
-            : (propertyDefaults[property as keyof CSS.Properties] || defaultUnit('px'))(value);
+            : (propertyDefaults[property as keyof Properties] || defaultUnit('px'))(value);
 }
 
 function arrayValues(property: string, values: any[]): string | undefined {
-    let separators = propertySeparators[property as keyof CSS.Properties] || [', '];
+    let separators = propertySeparators[property as keyof Properties] || [', '];
     let nested = false;
 
     return values
@@ -169,7 +174,7 @@ function functionKebabCase(name: string) {
     return name.replace(/[A-Z](?!$)/g, capital => `-${capital.toLowerCase()}`);
 }
 
-export const propertyDefaults: { [property in keyof CSS.Properties]?: (value: any) => string } = {
+export const propertyDefaults: { [property in keyof Properties]?: (value: any) => string } = {
     animationDuration: defaultUnitAndValue('ms', '0ms'),
     animationTimingFunction: defaultValue('ease'),
     animationDelay: defaultUnitAndValue('ms', '0ms'),
@@ -210,7 +215,7 @@ export const functionDefaults: { [cssFunction: string]: ((value: any) => string)
     skewY: [defaultUnit('deg')]
 };
 
-export const propertySeparators: { [property in keyof CSS.Properties]?: string[] } = {
+export const propertySeparators: { [property in keyof Properties]?: string[] } = {
     borderColor: [' '],
     borderRadius: [' '],
     borderStyle: [' '],
