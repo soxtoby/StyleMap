@@ -1,15 +1,21 @@
 import { Property } from "csstype";
-import { css, cssPropertyValue, fontFaceCss, keyframesCss, splitProperties, cssProperties } from "./css";
-import { AnimationDefinition, CSSProperties, FontFaceDefinition, KeyFrames, PropertyType, RegisteredStyles, Rules, StyleCollection, Styles, Variable, Registered, ElementStyle } from "./types";
+import { css, cssProperties, cssPropertyValue, fontFaceCss, keyframesCss, splitProperties } from "./css";
+import { AnimationDefinition, CSSProperties, ElementStyle, FontFaceDefinition, KeyFrames, PropertyType, Registerable, RegisteredStyles, Rules, StyleCollection, Styles, Variable } from "./types";
+
+export const RegistrationId = Symbol('RegistrationId');
+export type Registration = { [RegistrationId]?: string; }
+type NamedRegistration<T> = readonly [string, T] & Registration;
 
 let registeredFontFaces = [] as FontFaceDefinition[];
 let registeredRules = [] as Rules[];
-let registeredStyles = [] as [string, RegisteredStyles][];
-let registeredKeyframes = [] as [string, KeyFrames][];
+let registeredStyles = [] as NamedRegistration<RegisteredStyles>[];
+let registeredKeyframes = [] as NamedRegistration<KeyFrames>[];
 let registeredVariables = [] as Variable<any>[];
 let stylesheetRequired = true;
+let hmrEnabled = !!module.hot;
+let updateTimeout = 0;
 export let stylesheet: HTMLStyleElement;
-export const RegisteredStyle = Symbol('StyleRendered');
+export const StyleRendered = Symbol('StyleRendered');
 
 export function elementStyle(styles: CSSProperties): ElementStyle {
     let { properties, nested, keyframes } = splitProperties(styles);
@@ -26,7 +32,7 @@ export function elementStyle(styles: CSSProperties): ElementStyle {
 }
 
 export function style(name: string, styles: Styles): RegisteredStyles {
-    name = register(registeredStyles, name, styles as RegisteredStyles);
+    name = register(registeredStyles, name, styles as RegisteredStyles, 1);
     return withToString(styles, () => name) as RegisteredStyles;
 }
 
@@ -35,17 +41,19 @@ export function classes(styleCollection: StyleCollection): string {
         return '';
     if (Array.isArray(styleCollection))
         return styleCollection.filter(Boolean).map(classes).join(' ');
-    if (styleCollection[RegisteredStyle] || !stylesheetRequired)
+    if (styleCollection[StyleRendered] || !stylesheetRequired)
         return styleCollection.toString();
     throw new Error(`'${styleCollection.toString()}' style is being used, but hasn't been added to the stylesheet.`);
 }
 
 export function cssRules(rules: Rules): Rules {
+    autoUpdateStylesheet();
     registeredRules.push(rules);
     return rules;
 }
 
 export function fontFace(definition: FontFaceDefinition): FontFaceDefinition {
+    autoUpdateStylesheet();
     registeredFontFaces.push(definition);
     return withToString(definition, () => definition.fontFamily);
 }
@@ -57,16 +65,22 @@ export function animation(...args: any[]) {
     if (typeof args[0] == 'object')
         args.unshift(undefined);
     else
-        registeredName = register(registeredKeyframes, args[0], args[1]);
+        registeredName = register(registeredKeyframes, args[0], args[1], 1);
 
     let [animationName, keyframes, animationDuration, animationTimingFunction, animationDelay, animationIterationCount, animationDirection, animationFillMode, animationPlayState] = args;
     return { animationName: registeredName || animationName, keyframes, animationDuration, animationTimingFunction, animationDelay, animationIterationCount, animationDirection, animationFillMode, animationPlayState };
 }
 
 export function variable<T extends keyof CSSProperties & string>(property: T, name?: string): Variable<T> {
-    let varName = `--${name || property}-${registeredVariables.length}`;
+    autoUpdateStylesheet();
+
+    let namePrefix = name || property;
+    let [id, index] = identifyRegistration(registeredVariables, namePrefix, 1);
+    let varName = `--${namePrefix}-${index}`;
+
     let variable = createVariable<T>(varName, property);
-    registeredVariables.push(variable);
+    variable[RegistrationId] = id;
+    registeredVariables[index] = variable;
     return variable;
 }
 
@@ -88,11 +102,29 @@ function isVariable<T extends keyof CSSProperties>(value: any): value is Variabl
     return typeof value == 'object' && typeof value.or == 'function';
 }
 
-function register<T extends Registered>(registry: [string, T][], name: string, styling: T) {
-    let suffixedName = `${name}-${registry.length}`;
-    registry.push([suffixedName, styling]);
-    styling[RegisteredStyle] = false;
+function register<T extends Registerable>(registry: NamedRegistration<T>[], name: string, styling: T, sourceFrameOffset: number) {
+    autoUpdateStylesheet();
+
+    let [id, index] = identifyRegistration(registry, name, sourceFrameOffset + 1);
+    let suffixedName = `${name}-${index}`;
+    registry[index] = Object.assign([suffixedName, styling] as const, { [RegistrationId]: id });
+    styling[StyleRendered] = false;
     return suffixedName;
+}
+
+function identifyRegistration<R extends Registration>(registrations: R[], name: string, sourceFrameOffset: number): [id: string | undefined, index: number] {
+    if (!hmrEnabled)
+        return [undefined, registrations.length];
+
+    let stack = new Error('msg').stack?.split('\n') ?? [];
+    sourceFrameOffset++; // For this function
+    if (stack[0].includes('msg'))
+        sourceFrameOffset++; // Chrome includes error message at top of stack, but Firefox does not
+    let callerModule = stack[sourceFrameOffset].split(/[@\(]/)[0]; // Strip off line number - module level is good enough
+    let id = `${name}:${callerModule}`;
+
+    let existingRegistrationIndex = registrations.findIndex(r => r[RegistrationId] == id);
+    return [id, existingRegistrationIndex >= 0 ? existingRegistrationIndex : registrations.length];
 }
 
 function withToString<T>(obj: T, toString: () => string) {
@@ -100,10 +132,18 @@ function withToString<T>(obj: T, toString: () => string) {
     return obj;
 }
 
+function autoUpdateStylesheet() {
+    // Auto-update styles if stylesheet has already been rendered
+    if (hmrEnabled && stylesheet) {
+        clearTimeout(updateTimeout);
+        updateTimeout = setTimeout(updateStylesheet) as any as number;
+    }
+}
+
 export function updateStylesheet() {
     ensureStylesheet();
     stylesheet.innerHTML = getCss() + '\n/*# sourceURL=stylemap.css */';
-    registeredStyles.forEach(([, s]) => s[RegisteredStyle] = true);
+    registeredStyles.forEach(([, s]) => s[StyleRendered] = true);
 }
 
 /**
@@ -112,6 +152,14 @@ export function updateStylesheet() {
  */
 export function requireStylesheet(enable = true) {
     stylesheetRequired = enable;
+}
+
+/**
+ * Enable or disable experimental support for Hot Module Replacement (HMR). Enabled by default if `module.hot` is available.
+ * Not recommended in production.
+ */
+export function enableHmrSupport(enable = true) {
+    hmrEnabled = enable;
 }
 
 export function getCss() {
@@ -131,7 +179,7 @@ function ensureStylesheet() {
 }
 
 export function resetStyles() {
-    registeredStyles.forEach(([, s]) => delete (s as any)[RegisteredStyle]);
+    registeredStyles.forEach(([, s]) => delete (s as any)[StyleRendered]);
     registeredFontFaces = [];
     registeredStyles = [];
     registeredRules = [];

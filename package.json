@@ -1,6 +1,6 @@
 {
   "name": "stylemap",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "CSS in JS/TS",
   "main": "lib/index.js",
   "types": "lib/index",
@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "@types/jest": "*",
+    "@types/webpack-env": "*",
     "jest": "*",
     "ts-jest": "*",
     "typescript": "*"

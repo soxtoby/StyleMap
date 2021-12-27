@@ -1,5 +1,5 @@
-import { Properties, Property, AtRule } from 'csstype';
-import { RegisteredStyle } from './styling';
+import { AtRule, Properties, Property } from 'csstype';
+import { Registration, StyleRendered } from './styling';
 
 type Overwrite<T, U> = Omit<T, keyof T & keyof U> & U;
 type Defined<T> = Exclude<T, undefined>;
@@ -119,11 +119,11 @@ export interface Styles extends CSSProperties {
     '::selection'?: Styles;
 }
 
-export interface Registered {
-    [RegisteredStyle]: boolean;
+export interface Registerable {
+    [StyleRendered]: boolean;
 }
 
-export interface RegisteredStyles extends Styles, Registered {
+export interface RegisteredStyles extends Styles, Registerable {
     /** Returns class name */
     toString(): string;
 }
@@ -199,7 +199,7 @@ export type FontFaceSrc = string | { local: string } | { url: string, format?: F
 
 export type FontFaceFormat = 'woff' | 'woff2' | 'truetype' | 'opentype' | 'embedded-opentype' | 'svg' | string;
 
-export interface KeyFrames {
+export interface KeyFrames extends Partial<Registerable> {
     from?: CSSProperties;
     to?: CSSProperties;
     [percentage: string]: CSSProperties | undefined;
@@ -214,7 +214,7 @@ interface VariableOfType<T> {
 }
 
 /** Will resolve to var(--name, fallback), with normal property defaults applied. */
-export interface Variable<T extends keyof CSSProperties> extends VariableOfType<PropertyType<T>> {
+export interface Variable<T extends keyof CSSProperties> extends VariableOfType<PropertyType<T>>, Registration {
     /** [name, fallback] */
     var: [string, PropertyType<T> | VariableOfType<PropertyType<T>> | undefined];
     /** Returns an object to spread into styles to set the value of the variable. */

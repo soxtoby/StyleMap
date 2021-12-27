@@ -1,5 +1,5 @@
 import { Properties, Property } from "csstype";
-import { RegisteredStyle } from './styling';
+import { StyleRendered } from './styling';
 import { AnimationDefinition, FontFaceDefinition, KeyFrames, Rules, Styles } from "./types";
 import { defaultUnit, defaultUnitAndValue, defaultValue } from "./utils";
 
@@ -78,7 +78,7 @@ function animationValues(value: Property.Animation | AnimationDefinition, select
 
 function singleAnimation(animation: Property.Animation | AnimationDefinition, selector: string, index = 0): { value: string, keyframes: [string, KeyFrames][] } {
     if (isAnimationDefinition(animation)) {
-        if (!animation.keyframes || RegisteredStyle in animation.keyframes)
+        if (!animation.keyframes || StyleRendered in animation.keyframes)
             return { value: animationFromDefinition(animation), keyframes: [] };
 
         let animationName = inlineAnimationName(animation.animationName, selector, index);
