@@ -12,7 +12,7 @@ let registeredStyles = [] as NamedRegistration<RegisteredStyles>[];
 let registeredKeyframes = [] as NamedRegistration<KeyFrames>[];
 let registeredVariables = [] as Variable<any>[];
 let stylesheetRequired = true;
-let hmrEnabled = !!module.hot;
+let hmrEnabled = !!(module as any).hot;
 let updateTimeout = 0;
 export let stylesheet: HTMLStyleElement;
 export const StyleRendered = Symbol('StyleRendered');
@@ -175,7 +175,6 @@ export function getCss() {
 function ensureStylesheet() {
     if (!stylesheet) {
         stylesheet = document.createElement('style');
-        stylesheet.type = "text/css";
         document.head.appendChild(stylesheet);
     }
 }
