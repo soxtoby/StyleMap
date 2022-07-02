@@ -107,6 +107,8 @@ function register<T extends Registerable>(registry: NamedRegistration<T>[], name
 
     let [id, index] = identifyRegistration(registry, name, sourceFrameOffset + 1);
     let suffixedName = `${name}-${index}`;
+    if (registry[index]?.[1][StyleRendered] === false)
+        throw new Error(`'${suffixedName}' style registered more than once between stylesheet updates. Style names must be unique within a module when HMR support is enabled.`);
     registry[index] = Object.assign([suffixedName, styling] as const, { [RegistrationId]: id });
     styling[StyleRendered] = false;
     return suffixedName;
