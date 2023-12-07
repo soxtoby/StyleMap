@@ -122,7 +122,7 @@ function identifyRegistration<R extends Registration>(registrations: R[], name: 
     sourceFrameOffset++; // For this function
     if (stack[0].includes('msg'))
         sourceFrameOffset++; // Chrome includes error message at top of stack, but Firefox does not
-    let callerModule = stack[sourceFrameOffset].split(/(?<!\/)@|\(/)[0]; // Strip off line number - module or function level is good enough
+    let callerModule = stack[sourceFrameOffset].split(new RegExp('(?<!\\/)@|\\('))[0]; // Strip off line number - module or function level is good enough
     let id = `${name}:${callerModule}`;
 
     let existingRegistrationIndex = registrations.findIndex(r => r[RegistrationId] == id);
