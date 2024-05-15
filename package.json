@@ -2,8 +2,6 @@
   "name": "stylemap",
   "version": "0.3.1",
   "description": "CSS in JS/TS",
-  "main": "lib/index.js",
-  "types": "lib/index",
   "author": "Simon Oxtoby",
   "homepage": "https://github.com/soxtoby/StyleMap",
   "repository": {
@@ -11,20 +9,42 @@
     "url": "https://github.com/soxtoby/StyleMap.git"
   },
   "license": "MIT",
+  "type": "module",
+  "main": "./dist/commonjs/index.js",
+  "types": "./dist/commonjs/index.d.ts",
   "scripts": {
-    "prepare": "./node_modules/.bin/tsc"
+    "prepack": "tshy"
+  },
+  "files": [
+    "dist"
+  ],
+  "tshy": {
+    "project": "./tsconfig.build.json",
+    "exports": {
+      "./package.json": "./package.json",
+      ".": "./src/index.ts"
+    }
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/commonjs/index.d.ts",
+        "default": "./dist/commonjs/index.js"
+      }
+    }
   },
   "devDependencies": {
-    "@types/jest": "*",
-    "@types/webpack-env": "*",
-    "jest": "*",
-    "ts-jest": "*",
+    "@happy-dom/global-registrator": "^14.11.0",
+    "@types/bun": "*",
+    "tshy": "*",
     "typescript": "*"
   },
   "dependencies": {
     "csstype": "*"
-  },
-  "files": [
-    "lib"
-  ]
+  }
 }

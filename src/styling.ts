@@ -1,6 +1,6 @@
-import { Property } from "csstype";
-import { css, cssProperties, cssPropertyValue, fontFaceCss, keyframesCss, splitProperties } from "./css";
-import { AnimationDefinition, CSSProperties, ElementStyle, FontFaceDefinition, KeyFrames, PropertyType, Registerable, RegisteredStyles, Rules, StyleCollection, Styles, Variable } from "./types";
+import type { Property } from "csstype";
+import { css, cssProperties, cssPropertyValue, fontFaceCss, keyframesCss, splitProperties } from "./css.js";
+import type { AnimationDefinition, CSSProperties, ElementStyle, FontFaceDefinition, KeyFrames, PropertyType, Registerable, RegisteredStyles, Rules, StyleCollection, Styles, Variable } from "./types.js";
 
 export const RegistrationId = Symbol('RegistrationId');
 export type Registration = { [RegistrationId]?: string; }
@@ -12,7 +12,7 @@ let registeredStyles = [] as NamedRegistration<RegisteredStyles>[];
 let registeredKeyframes = [] as NamedRegistration<KeyFrames>[];
 let registeredVariables = [] as Variable<any>[];
 let stylesheetRequired = true;
-let hmrEnabled = !!(module as any).hot;
+let hmrEnabled = !!(global.module as any)?.hot;
 let updateTimeout = 0;
 export let stylesheet: HTMLStyleElement;
 export const StyleRendered = Symbol('StyleRendered');
@@ -120,9 +120,9 @@ function identifyRegistration<R extends Registration>(registrations: R[], name: 
 
     let stack = new Error('msg').stack?.split('\n') ?? [];
     sourceFrameOffset++; // For this function
-    if (stack[0].includes('msg'))
+    if (stack[0]?.includes('msg'))
         sourceFrameOffset++; // Chrome includes error message at top of stack, but Firefox does not
-    let callerModule = stack[sourceFrameOffset].split(/(?<!\/)@|\(/)[0]; // Strip off line number - module or function level is good enough
+    let callerModule = stack[sourceFrameOffset]?.split(/(?<!\/)@|\(/)[0] ?? '<unknown>'; // Strip off line number - module or function level is good enough
     let id = `${name}:${callerModule}`;
 
     let existingRegistrationIndex = registrations.findIndex(r => r[RegistrationId] == id);
@@ -185,4 +185,5 @@ export function resetStyles() {
     registeredStyles = [];
     registeredRules = [];
     registeredKeyframes = [];
+    registeredVariables = [];
 }
