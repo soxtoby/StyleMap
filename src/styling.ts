@@ -71,29 +71,39 @@ export function animation(...args: any[]) {
     return { animationName: registeredName || animationName, keyframes, animationDuration, animationTimingFunction, animationDelay, animationIterationCount, animationDirection, animationFillMode, animationPlayState }
 }
 
-export function variable<T extends keyof CSSProperties & string>(property: T, name?: string): Variable<T> {
+/**
+ * Declares a custom CSS property.
+ * @param property Name of the CSS property the variable will be used for (e.g. 'color' or 'width'). Doesn't restrict usage; just provides typing.
+ * @param displayName Display name for the custom CSS property.
+ * @param defaultValue If specified, will be set in the `:root` selector.
+ */
+export function variable<T extends keyof CSSProperties & string>(property: T, displayName?: string, defaultValue?: PropertyType<T>): Variable<T> {
     autoUpdateStylesheet()
 
-    let namePrefix = name || property
+    let namePrefix = displayName || property
     let [id, index] = identifyRegistration(registeredVariables, namePrefix, 1)
     let varName = `--${namePrefix}-${index}`
 
     let variable = createVariable<T>(varName, property)
     variable[RegistrationId] = id
     registeredVariables[index] = variable
+
+    if (defaultValue)
+        cssRules({ ':root': { ...variable.set(defaultValue) } });
+
     return variable
 }
 
-function createVariable<T extends keyof CSSProperties>(name: string, property: string, fallback?: PropertyType<T> | Variable<T>): Variable<T> {
+function createVariable<T extends keyof CSSProperties>(varName: string, property: string, fallback?: PropertyType<T> | Variable<T>): Variable<T> {
     return Object.assign(Object.create({
         set(value: PropertyType<T>) {
-            return { [name]: cssPropertyValue(property, value) }
+            return { [varName]: cssPropertyValue(property, value) }
         },
         or(newFallback: PropertyType<T> | Variable<T>) {
-            return createVariable<T>(name, property, isVariable(fallback) ? fallback.or(newFallback) : newFallback)
+            return createVariable<T>(varName, property, isVariable(fallback) ? fallback.or(newFallback) : newFallback)
         },
         toString() {
-            return `var(${[name, cssPropertyValue(property, fallback)].filter(Boolean).join(', ')})`
+            return `var(${[varName, cssPropertyValue(property, fallback)].filter(Boolean).join(', ')})`
         }
     }), { var: [name, fallback] })
 }

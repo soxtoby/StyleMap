@@ -158,6 +158,7 @@ test("variables", () => {
     let test1 = variable('width', 'test')
     let test2 = variable('width', 'test')
     let defaultName = variable('width')
+    let defaultValue = variable('width', 'test', 3)
 
     expect(test1.toString()).toBe('var(--test-0)')
     expect(test2.toString()).toBe('var(--test-1)')
@@ -167,4 +168,7 @@ test("variables", () => {
     expect(test1.or('fallback').toString()).toBe('var(--test-0, fallback)')
     expect(test1.or(1).toString()).toBe('var(--test-0, 1px)')
     expect(test1.or(test2).or('fallback').toString()).toBe('var(--test-0, var(--test-1, fallback))')
+    
+    updateStylesheet()
+    expect(stylesheet.innerHTML).toInclude(':root { --test-3: 3px; }')
 });
