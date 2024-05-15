@@ -87,6 +87,8 @@ export function variable<T extends keyof CSSProperties & string>(property: T, na
 function createVariable<T extends keyof CSSProperties>(name: string, property: string, fallback?: PropertyType<T> | Variable<T>): Variable<T> {
     return Object.assign(Object.create({
         set(value: PropertyType<T>) {
+            if (value === this)
+                throw new Error(`Variable ${name} cannot be set to itself.`)
             return { [name]: cssPropertyValue(property, value) }
         },
         or(newFallback: PropertyType<T> | Variable<T>) {
@@ -95,7 +97,7 @@ function createVariable<T extends keyof CSSProperties>(name: string, property: s
         toString() {
             return `var(${[name, cssPropertyValue(property, fallback)].filter(Boolean).join(', ')})`
         }
-    }), { var: [name, fallback] })
+    }), { var: [name, fallback].filter(Boolean) })
 }
 
 function isVariable<T extends keyof CSSProperties>(value: any): value is Variable<T> {

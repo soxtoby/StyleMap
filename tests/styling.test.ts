@@ -167,4 +167,6 @@ test("variables", () => {
     expect(test1.or('fallback').toString()).toBe('var(--test-0, fallback)')
     expect(test1.or(1).toString()).toBe('var(--test-0, 1px)')
     expect(test1.or(test2).or('fallback').toString()).toBe('var(--test-0, var(--test-1, fallback))')
+    expect(elementStyle(test1.set(test2)).toString()).toBe('--test-0: var(--test-1);')
+    expect(() => test1.set(test1)).toThrow(`Variable --test-0 cannot be set to itself.`)
 })
