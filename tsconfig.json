@@ -1,16 +1,26 @@
 {
     "compilerOptions": {
-        "target": "es5",
-        "module": "commonjs",
-        "strict": true,
         "esModuleInterop": true,
-        "inlineSourceMap": true,
-        "inlineSources": true,
+        "skipLibCheck": true,
+        "target": "ES2022",
+        "allowJs": true,
+        "resolveJsonModule": true,
+        "moduleDetection": "force",
+        "isolatedModules": true,
+        "verbatimModuleSyntax": true,
+
+        "strict": true,
+        "noUncheckedIndexedAccess": true,
+        "noImplicitOverride": true,
+
+        "module": "NodeNext",
         "declaration": true,
-        "outDir": "lib",
+        "noEmit": true,
+
         "lib": [
-            "es2019",
-            "dom"
+            "ES2022",
+            "DOM",
+            "DOM.Iterable"
         ]
     },
     "include": [

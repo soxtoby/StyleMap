@@ -1,5 +1,5 @@
-import { AtRule, Properties, Property } from 'csstype';
-import { Registration, StyleRendered } from './styling';
+import type { AtRule, Properties, Property } from "csstype";
+import type { Registration, StyleRendered } from "./styling.js";
 
 type Overwrite<T, U> = Omit<T, keyof T & keyof U> & U;
 type Defined<T> = Exclude<T, undefined>;

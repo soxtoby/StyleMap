@@ -1,4 +1,5 @@
-import { animation, classes, cssRules, fontFace, resetStyles, style, stylesheet, updateStylesheet, variable, requireStylesheet, elementStyle } from "../src/styling";
+import { beforeEach, expect, mock, test } from "bun:test";
+import { animation, classes, cssRules, elementStyle, fontFace, requireStylesheet, resetStyles, style, stylesheet, updateStylesheet, variable } from "../src/styling";
 import { Styles } from "../src/types";
 
 const sourceUrl = '\n/*# sourceURL=stylemap.css */';
@@ -76,7 +77,7 @@ test("elementStyle toString returns style", () => {
 });
 
 test("elementStyle warns about nested styles", () => {
-    console.warn = jest.fn();
+    console.warn = mock();
 
     elementStyle({ ':hover': { width: 1 } } as Styles);
     expect(console.warn).toBeCalledWith('Cannot put nested properties in an element style:', expect.arrayContaining([['&:hover', { width: 1 }]]));
@@ -86,7 +87,7 @@ test("elementStyle warns about nested styles", () => {
 });
 
 test("elementStyle warns about inline keyframes", () => {
-    console.warn = jest.fn();
+    console.warn = mock();
 
     elementStyle({ animation: { keyframes: { from: { width: 1 }, to: { width: 2 } } } });
     expect(console.warn).toBeCalledWith('Cannot put keyframes inline in an element style:', expect.arrayContaining([['inline-animation-0', { from: { width: 1 }, to: { width: 2 } }]]));
@@ -99,7 +100,7 @@ test("cssRules returns rules", () => {
 
 test("style returns styles", () => {
     let styles = { width: 1 };
-    expect(style('test', styles)).toEqual(styles);
+    expect(style('test', styles) as Styles).toEqual(styles);
 });
 
 test("style toString returns class name", () => {
@@ -162,7 +163,7 @@ test("variables", () => {
     expect(test2.toString()).toBe('var(--test-1)');
     expect(defaultName.toString()).toBe('var(--width-2)');
     expect(test1.set('value')).toEqual({ '--test-0': 'value' });
-    expect(test1.or('fallback')).toEqual({ var: ['--test-0', 'fallback'] });
+    expect(test1.or('fallback') as object).toEqual({ var: ['--test-0', 'fallback'] });
     expect(test1.or('fallback').toString()).toBe('var(--test-0, fallback)');
     expect(test1.or(1).toString()).toBe('var(--test-0, 1px)');
     expect(test1.or(test2).or('fallback').toString()).toBe('var(--test-0, var(--test-1, fallback))');

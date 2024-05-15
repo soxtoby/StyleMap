@@ -1,7 +1,7 @@
-import { Properties, Property } from "csstype";
-import { StyleRendered } from './styling';
-import { AnimationDefinition, FontFaceDefinition, KeyFrames, Rules, Styles } from "./types";
-import { defaultUnit, defaultUnitAndValue, defaultValue } from "./utils";
+import type { Properties, Property } from "csstype";
+import { StyleRendered } from "./styling.js";
+import type { AnimationDefinition, FontFaceDefinition, KeyFrames, Rules, Styles } from "./types.js";
+import { defaultUnit, defaultUnitAndValue, defaultValue } from "./utils.js";
 
 export function css(rules: Rules) {
     return ruleSet('', ruleEntries(rules))
@@ -13,10 +13,9 @@ export function fontFaceCss(fontFace: FontFaceDefinition) {
 }
 
 export function keyframesCss(name: string, keyframes: KeyFrames) {
-    return `@keyframes ${name} {\n${
-        Object.entries(keyframes)
-            .map(([offset, styles]) => `  ${baseRule(defaultUnit('%', true)(offset), Object.entries(styles!))}`)
-            .join('\n')
+    return `@keyframes ${name} {\n${Object.entries(keyframes)
+        .map(([offset, styles]) => `  ${baseRule(defaultUnit('%', true)(offset), Object.entries(styles!))}`)
+        .join('\n')
         }\n}`;
 }
 
@@ -121,13 +120,13 @@ export function cssProperties(styles: [string, any][]) {
         .join(' ');
 }
 
-export function cssPropertyValue(property: string, value: any): string | undefined {
+export function cssPropertyValue(property: string, value: any) {
     return Array.isArray(value) ? arrayValues(property, value)
         : typeof value == 'object' ? cssFunctions(property, value)
             : (propertyDefaults[property as keyof Properties] || defaultUnit('px'))(value);
 }
 
-function arrayValues(property: string, values: any[]): string | undefined {
+function arrayValues(property: string, values: any[]): string {
     let separators = propertySeparators[property as keyof Properties] || [', '];
     let nested = false;
 
@@ -159,9 +158,11 @@ function cssFunctionParameterValue(property: string, fn: string, value: any, par
         return value.map(v => cssFunctionParameterValue(property, fn, v, parameterIndex)).join(' ');
     if (typeof value == 'object')
         return cssFunctions(property, value);
-    return fn in functionDefaults
-        ? functionDefaults[fn][Math.min(parameterIndex, functionDefaults[fn].length - 1)](value)
-        : cssPropertyValue(property, value)!;
+
+    let parameterDefault = fn in functionDefaults
+        ? functionDefaults[fn]![Math.min(parameterIndex, functionDefaults[fn]!.length - 1)]?.(value)
+        : null;
+    return parameterDefault ?? cssPropertyValue(property, value);
 }
 
 function kebabCase(name: string) {

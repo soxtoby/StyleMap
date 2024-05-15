@@ -1,4 +1,5 @@
-import { defaultUnit, defaultValue, defaultUnitAndValue } from "../src/utils";
+import { expect, test } from "bun:test";
+import { defaultUnit, defaultUnitAndValue, defaultValue } from "../src/utils";
 
 test("defaultUnit", () => {
     let sut = defaultUnit('foo');

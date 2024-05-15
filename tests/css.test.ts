@@ -1,5 +1,6 @@
+import { beforeEach, expect, test } from "bun:test";
 import { css, fontFaceCss, keyframesCss } from '../src/css';
-import { animation, variable, resetStyles } from '../src/styling';
+import { animation, resetStyles, variable } from '../src/styling';
 
 beforeEach(() => resetStyles());
 
@@ -17,7 +18,7 @@ test("basic properties", () => {
 test("vendor prefixes", () => {
     expect(css({ '.test': { WebkitAlignSelf: 'start' } })).toBe(`.test { -webkit-align-self: start; }`);
     expect(css({ '.test': { MozBoxAlign: 'start' } })).toBe(`.test { -moz-box-align: start; }`);
-    expect(css({ '.test': { msAlignSelf: 'start' } })).toBe(`.test { -ms-align-self: start; }`);
+    expect(css({ '.test': { msContentZooming: 'zoom' } })).toBe(`.test { -ms-content-zooming: zoom; }`);
 });
 
 test("arrays of rules", () => {
