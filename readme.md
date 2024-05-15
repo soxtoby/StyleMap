@@ -11,13 +11,13 @@ npm install --save stylemap
 ```
 Style some elements!
 ```tsx
-import { styles, updateStylesheet, classes } from 'stylemap';
+import { styles, updateStylesheet, classes } from 'stylemap'
 
-let hotPinkText = style('hotPink', { color: '#FF69B4' });
+let hotPinkText = style('hotPink', { color: '#FF69B4' })
 
-updateStylesheet();
+updateStylesheet()
 
-let HotPink = ({children}) => <div className={classes(hotPinkText)}>{children}</div>;
+let HotPink = ({children}) => <div className={classes(hotPinkText)}>{children}</div>
 ```
 (this example uses React, but you can use whatever you like)
 
@@ -26,7 +26,7 @@ Note the use of `updateStylesheet()` - registered styles must to added to the St
 ## Creating Styles
 Styles are created by passing a name and `Styles` object into the `style` function:
 ```ts
-let myStyle = style('style-name', { color: 'red' });
+let myStyle = style('style-name', { color: 'red' })
 ```
 Note that the name will have a number appended to it to create the CSS class name ([see below](#generated-names) for more detail).
 
@@ -42,7 +42,7 @@ Basic pseudo class and element selectors can be included in a `Styles` object an
 
 Code:
 ```ts
-style('textbox', { ':focus': { background: 'lightgreen' } });
+style('textbox', { ':focus': { background: 'lightgreen' } })
 ```
 CSS:
 ```css
@@ -57,7 +57,7 @@ Code:
 style('parent', { $: {
     'input': { background: 'white' },
     '> label': { color: 'black' }
-} });
+} })
 ```
 CSS:
 ```css
@@ -72,7 +72,7 @@ Code:
 style('parent', { $: { 
     'input&': { color: 'blue' },
     '&:disabled': { color: 'grey' }
-} });
+} })
 ```
 CSS:
 ```css
@@ -84,7 +84,7 @@ Both `@media` and `@supports` can be nested inside a style as selectors, and wil
 
 Code:
 ```ts
-style('myThing', { $: { '@media screen': { fontSize: 'large' } } });
+style('myThing', { $: { '@media screen': { fontSize: 'large' } } })
 ```
 CSS:
 ```css
@@ -97,20 +97,20 @@ Some properties allow multiple values as an array, which will be separated appro
 style('ugly-box', {
     padding: [4, 8, 4, 16],
     background: ['linear-gradient(blue, red)', 'purple']
-});
+})
 ```
 CSS:
 ```css
 .ugly-box-0 {
-  padding: 4px 8px 4px 16px;
-  background: linear-gradient(blue, red), purple;
+  padding: 4px 8px 4px 16px
+  background: linear-gradient(blue, red), purple
 }
 ```
 
 ### CSS Functions
 Some properties allow specifying the value as an object with CSS functions for the property names. E.g.
 ```ts
-style('squeeze', { transform: { scale: 0.8, rotate: 30 } });
+style('squeeze', { transform: { scale: 0.8, rotate: 30 } })
 ```
 CSS:
 ```css
@@ -121,15 +121,15 @@ CSS:
 ### Class Names
 To get the class name of a style, use the `classes` function.
 ```ts
-let myStyle = style('styleName', { color: 'red' });
+let myStyle = style('styleName', { color: 'red' })
 let className = classes(myStyle); // Returns e.g. 'styleName-0'
 ```
 The `classes` function will also take in a nested array of styles, `false` or `undefined`, to produce a space-separated list of class names.
 ```ts
-let style1 = style('red', { color: 'red' });
-let style2 = style('blue', { color: 'blue' });
-let undefinedStyle = undefined;
-let condition = false;
+let style1 = style('red', { color: 'red' })
+let style2 = style('blue', { color: 'blue' })
+let undefinedStyle = undefined
+let condition = false
 
 classes([style1, [style2, undefinedStyle]]); // Returns e.g. 'red-0 blue-1'
 classes([style1, condition && style2]); // Returns e.g. 'red-0`
@@ -141,21 +141,21 @@ StyleMap styles can be converted to more standard CSS style objects with the `el
 These objects can be passed directly to a React style prop, or `toString`'d for use as an element's style attribute.
 ```ts
 // Returns { width: '100px', padding: '2px 4px' }
-let inlineStyle = elementStyle({ width: 100, padding: [2, 4] });
+let inlineStyle = elementStyle({ width: 100, padding: [2, 4] })
 // toString returns 'width: 100px; padding: 2px 4px;'
-element.style = inlineStyle.toString();
+element.style = inlineStyle.toString()
 ```
 Note that nested selectors/styles, and inline animation keyframes are not supported by `elementStyle`.
 
 ### Style References
 To reference one style from another style, you can use template strings:
 ```ts
-let style1 = style('inner', { border: '1px solid red' });
+let style1 = style('inner', { border: '1px solid red' })
 let style2 = style('outer', {
     $: {
         [`.${style1}`]: { borderColor: 'green' }
     }
-});
+})
 ```
 CSS:
 ```css
@@ -168,11 +168,11 @@ Note the `.` before `${style1}`, as a style's `toString()` only returns the clas
 The `style` function returns an object, which makes it easy to mix-in with other styles:
 
 ```ts
-let red = style('red', { color: 'red' });
+let red = style('red', { color: 'red' })
 let error = style('error', {
     fontWeight: 'bold',
     ...red
-});
+})
 ```
 
 ## Animations
@@ -189,7 +189,7 @@ style('popup', {
             transform: 'none'
         }
     }, 100, 'ease-out')
-});
+})
 ```
 CSS:
 ```css
@@ -203,17 +203,17 @@ Note that unspecified animation properties are filled in with their defaults.
 
 Animations can also be defined outside a style, to be re-used:
 ```ts
-let reusableAnimation = animation('reuse-me', { 50: { transform: { scale: 2 } } }, '1s');
+let reusableAnimation = animation('reuse-me', { 50: { transform: { scale: 2 } } }, '1s')
 style('animated', {
     animation: reusableAnimation,
     animationIterationCount: 'infinite'
-});
+})
 ```
 CSS:
 ```css
 .animated-0 {
-  animation: reuse-me-0 1s ease 0ms 1 normal none running;
-  animation-iteration-count: infinite;
+  animation: reuse-me-0 1s ease 0ms 1 normal none running
+  animation-iteration-count: infinite
 }
 @keyframes reuse-me-0 {
   50% { transform: scale(2); }
@@ -228,7 +228,7 @@ Code:
 cssRules({
     'body': { background: 'white' },
     'input:focus': { outlineColor: 'blue' }
-});
+})
 ```
 CSS:
 ```css
@@ -251,15 +251,15 @@ let myFont = fontFace({
 CSS:
 ```css
 @font-face {
-    font-family: myFont;
-    font-weight: bold;
-    src: url(/myfont.woff) format(woff), local(Arial);
+    font-family: myFont
+    font-weight: bold
+    src: url(/myfont.woff) format(woff), local(Arial)
 }
 ```
 
 To use the font in a style, reference the font face's `fontFamily` property:
 ```ts
-style('special-text': { fontFamily: myFont.fontFamily });
+style('special-text': { fontFamily: myFont.fontFamily })
 ```
 
 ## CSS Variables
@@ -271,11 +271,11 @@ let dynamicColor = variable('color', 'variable-name'); // variable name is optio
 ```
 then use the variable in a style:
 ```ts
-let dynamicStyle = style('dynamic', { color: dynamicColor });
+let dynamicStyle = style('dynamic', { color: dynamicColor })
 ```
 and set the variable in either a CSS rule, or an element's `style` attribute:
 ```tsx
-cssRules({ '::global': { ...dynamicColor.set('red') } });
+cssRules({ '::global': { ...dynamicColor.set('red') } })
 // or
 <div style={{ ...dynamicColor.set('blue') }} />
 ```
