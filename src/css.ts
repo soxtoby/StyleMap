@@ -1,6 +1,6 @@
 import type { Properties, Property } from "csstype"
 import { StyleRendered } from "./styling.js"
-import type { AnimationDefinition, FontFaceDefinition, KeyFrames, Rules, Styles } from "./types.js"
+import type { AnimationDefinition, FontFaceDefinition, KeyFrames, MultiValueProperties, Rules, Styles } from "./types.js"
 import { defaultUnit, defaultUnitAndValue, defaultValue } from "./utils.js"
 
 export function css(rules: Rules) {
@@ -148,7 +148,7 @@ function cssFunctions(property: string, functionMap: object) {
 
 function cssFunctionValue(property: string, fn: string, value: any): string {
     if (Array.isArray(value))
-        return value.map((v, i) => cssFunctionParameterValue(property, fn, v, i)).join(', ')
+        return value.map((v, i) => cssFunctionParameterValue(property, fn, v, i)).join(cssFunctionParameterSeparators[fn] ?? ', ')
     return cssFunctionParameterValue(property, fn, value, 0)
 }
 
@@ -187,6 +187,7 @@ export const propertyDefaults: { [property in keyof Properties]?: (value: any) =
     flexGrow: defaultUnit(''),
     flexShrink: defaultUnit(''),
     fontWeight: defaultUnit(''),
+    gridArea: defaultUnit(''),
     gridColumn: defaultUnit(''),
     gridRow: defaultUnit(''),
     lineHeight: defaultUnit(''),
@@ -215,7 +216,12 @@ export const functionDefaults: { [cssFunction: string]: ((value: any) => string)
     skewY: [defaultUnit('deg')]
 }
 
-export const propertySeparators: { [property in keyof Properties]?: string[] } = {
+/** Default is comma. Nested arrays will use next separator in array.  */
+export const propertySeparators: { [property in keyof MultiValueProperties]?: string[] } = {
+    aspectRatio: [' '],
+    animationRange: [' '],
+    animationRangeEnd: [' '],
+    animationRangeStart: [' '],
     borderColor: [' '],
     borderRadius: [' '],
     borderStyle: [' '],
@@ -228,5 +234,14 @@ export const propertySeparators: { [property in keyof Properties]?: string[] } =
     gridTemplateRows: [' '],
     margin: [' '],
     padding: [' '],
+    scale: [' '],
+    translate: [' '],
     transform: [' '],
-};
+}
+
+/** Default is comma. */
+export const cssFunctionParameterSeparators: { [cssFunction: string]: string } = {
+    inset: ' ',
+    circle: ' ',
+    ellipse: ' ',
+}

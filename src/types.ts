@@ -12,20 +12,22 @@ type ExtendedProperties = Overwrite<BaseProperties, {
     animation?: Property.Animation | AnimationDefinition
     animationDuration?: Property.AnimationDuration | number
     animationDelay?: Property.AnimationDelay | number
+    aspectRatio?: Property.AspectRatio | ['auto', number] | [number, 'auto']
     background?: Property.Background<TLength> | BackgroundImageFunctions
     backgroundImage?: Property.Background<TLength> | BackgroundImageFunctions
+    clipPath?: Property.ClipPath | BasicShapeFunctions
     gridAutoColumns?: Property.GridAutoColumns<TLength> | GridBreadthFunctions
     gridAutoRows?: Property.GridAutoRows<TLength> | GridBreadthFunctions
     gridTemplate?: ExtendedProperties['gridTemplateRows'] | ExtendedProperties['gridTemplateRows'][]
     gridTemplateColumns?: Property.GridTemplateColumns<TLength> | GridTemplateFunctions
     gridTemplateRows?: Property.GridTemplateRows<TLength> | GridTemplateFunctions
-    transitionDuration?: Property.TransitionDelay | number
+    transitionDuration?: Property.TransitionDuration | number
     transitionDelay?: Property.TransitionDelay | number
     transform?: Property.Transform | TransformFunctions
 }>
 type VariableProperties = { [K in keyof ExtendedProperties]: ExtendedProperties[K] | VariableOfType<PropertyType<K>> }
-type MultiValueProperties = AllowMultiple<VariableProperties,
-    'animation'
+export type MultiValueProperties = AllowMultiple<VariableProperties,
+    | 'animation'
     | 'animationDelay'
     | 'animationDirection'
     | 'animationDuration'
@@ -33,6 +35,9 @@ type MultiValueProperties = AllowMultiple<VariableProperties,
     | 'animationIterationCount'
     | 'animationName'
     | 'animationPlayState'
+    | 'animationRange'
+    | 'animationRangeEnd'
+    | 'animationRangeStart'
     | 'animationTimingFunction'
     | 'background'
     | 'backgroundAttachment'
@@ -63,7 +68,9 @@ type MultiValueProperties = AllowMultiple<VariableProperties,
     | 'gridTemplateRows'
     | 'margin'
     | 'padding'
+    | 'scale'
     | 'textShadow'
+    | 'translate'
     | 'transition'
     | 'transitionDelay'
     | 'transitionDuration'
@@ -149,6 +156,30 @@ export type AnimationDefinition = Pick<VariableProperties,
     | 'animationPlayState'>
     & { keyframes?: KeyFrames }
 
+export interface BackgroundImageFunctions {
+    url?: string
+    linearGradient?: string | (string | Property.Color)[]
+    radialGradient?: string | (string | Property.Color)[]
+    conicGradient?: string | (string | Property.Color)[]
+    repeatingLinearGradient?: string | (string | Property.Color)[]
+    repeatingRadialGradient?: string | (string | Property.Color)[]
+}
+
+export type BasicShapeFunctions =
+    | { inset?: string | (TLength | 'round')[] }
+    | { circle?: string | (string | TLength)[] }
+    | { ellipse?: string | (string | TLength)[] }
+    | { polygon?: string | [Property.FillRule, ...[TLength, TLength][]] | [TLength, TLength][] }
+    | { path?: string }
+
+export interface GridBreadthFunctions {
+    minmax?: [Property.GridAutoRows<TLength>, Property.GridAutoRows<TLength>]
+}
+
+export interface GridTemplateFunctions extends GridBreadthFunctions {
+    repeat?: [number | 'auto-fill' | 'auto-fit', ExtendedProperties['gridAutoRows'] | ExtendedProperties['gridAutoRows'][]]
+}
+
 export interface TransformFunctions {
     matrix?: string | [number, number, number, number, number, number]
     matrix3d?: string | [number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number]
@@ -171,23 +202,6 @@ export interface TransformFunctions {
     skewX?: TLength
     skewY?: TLength
     perspective?: TLength
-}
-
-export interface BackgroundImageFunctions {
-    url?: string
-    linearGradient?: string | (string | Property.Color)[]
-    radialGradient?: string | (string | Property.Color)[]
-    conicGradient?: string | (string | Property.Color)[]
-    repeatingLinearGradient?: string | (string | Property.Color)[]
-    repeatingRadialGradient?: string | (string | Property.Color)[]
-}
-
-export interface GridBreadthFunctions {
-    minmax?: [Property.GridAutoRows<TLength>, Property.GridAutoRows<TLength>]
-}
-
-export interface GridTemplateFunctions extends GridBreadthFunctions {
-    repeat?: [number | 'auto-fill' | 'auto-fit', ExtendedProperties['gridAutoRows'] | ExtendedProperties['gridAutoRows'][]]
 }
 
 export type FontFaceDefinition = Overwrite<AtRule.FontFace, {

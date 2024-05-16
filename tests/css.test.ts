@@ -258,4 +258,7 @@ test("functions", () => {
 
     expect(css({ '.test': { gridTemplateRows: { repeat: [1, [2, { minmax: [3, 4] }]] } } }))
         .toBe('.test { grid-template-rows: repeat(1, 2px minmax(3px, 4px)); }')
+
+    expect(css({ '.test': { clipPath: { inset: [1, 2, 3, 4] } } }))
+        .toBe('.test { clip-path: inset(1px 2px 3px 4px); }')
 })
