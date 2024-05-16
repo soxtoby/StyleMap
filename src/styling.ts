@@ -31,9 +31,10 @@ export function elementStyle(styles: CSSProperties): ElementStyle {
     return withToString(elementStyle, () => cssProperties(properties))
 }
 
-export function style(name: string, styles: Styles): RegisteredStyles {
-    name = register(registeredStyles, name, styles as RegisteredStyles, 1)
-    return withToString(styles, () => name) as RegisteredStyles
+export function style(name: string, styles: Styles = {}): RegisteredStyles {
+    let registered = styles as RegisteredStyles
+    name = register(registeredStyles, name, registered, 1)
+    return withToString(registered, () => name)
 }
 
 export function classes(styleCollection: StyleCollection): string {
@@ -171,6 +172,7 @@ export function getCss() {
         .concat(registeredRules.map(css))
         .concat(registeredStyles.map(([name, styles]) => css({ [`.${name}`]: styles })))
         .concat(registeredKeyframes.map(([name, frames]) => keyframesCss(name, frames)))
+        .filter(Boolean)
         .join('\n')
 }
 

@@ -22,6 +22,7 @@ test("rules added to stylesheet", () => {
 test("styles added to stylesheet", () => {
     style('test', { width: 1 })
     style('test', { width: 2 })
+    style('marker')
 
     updateStylesheet()
 

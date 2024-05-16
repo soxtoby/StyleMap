@@ -21,12 +21,11 @@ export function keyframesCss(name: string, keyframes: KeyFrames) {
 
 function ruleSet(parentSelector: string, rules: [string, Styles][]): string[] {
     return rules
-        .map(([selector, styles]) =>
+        .flatMap(([selector, styles]) =>
             selector.startsWith('@media') || selector.startsWith('@supports') ? styleRules(parentSelector, styles).map(rule => `${selector} { ${rule} }`)
                 : selector.includes('&') ? styleRules(selector.replace(/&/g, parentSelector), styles)
                     : parentSelector ? styleRules(`${parentSelector} ${selector}`, styles)
                         : styleRules(selector, styles))
-        .reduce((a, b) => a.concat(b), [])
 }
 
 function styleRules(selector: string, styles: Styles) {
