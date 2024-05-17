@@ -22,7 +22,7 @@ export function keyframesCss(name: string, keyframes: KeyFrames) {
 function ruleSet(parentSelector: string, rules: [string, Styles][]): string[] {
     return rules
         .flatMap(([selector, styles]) =>
-            selector.startsWith('@media') || selector.startsWith('@supports') ? styleRules(parentSelector, styles).map(rule => `${selector} { ${rule} }`)
+            parentSelector && selector[0] == '@' && nestedAtRules.some(r => selector.startsWith(r)) ? styleRules(parentSelector, styles).map(rule => `${selector} { ${rule} }`)
                 : selector.includes('&') ? styleRules(selector.replace(/&/g, parentSelector), styles)
                     : parentSelector ? styleRules(`${parentSelector} ${selector}`, styles)
                         : styleRules(selector, styles))
@@ -173,6 +173,8 @@ function kebabCase(name: string) {
 function functionKebabCase(name: string) {
     return name.replace(/[A-Z](?!$)/g, capital => `-${capital.toLowerCase()}`)
 }
+
+export const nestedAtRules = ['@media', '@scope', '@starting-style', '@supports']
 
 export const propertyDefaults: { [property in keyof Properties]?: (value: any) => string } = {
     animationDuration: defaultUnitAndValue('ms', '0ms'),

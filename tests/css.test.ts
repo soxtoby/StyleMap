@@ -37,6 +37,7 @@ test("basic properties with multiple values", () => {
 
 test("top-level at-rules", () => {
     expect(css({ '@page': { margin: '1cm' } })).toBe(`@page { margin: 1cm; }`)
+    expect(css({ '@supports (display: grid)': { display: 'grid' } })).toBe(`@supports (display: grid) { display: grid; }`)
 })
 
 test("multiple properties", () => {
