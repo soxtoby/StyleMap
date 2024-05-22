@@ -229,6 +229,8 @@ interface VariableOfType<T> {
 
 /** Will resolve to var(--name, fallback), with normal property defaults applied. */
 export interface Variable<T extends keyof CSSProperties> extends VariableOfType<PropertyType<T>>, Registration {
+    /** Returns variable name in --name format. */
+    readonly cssName: string;
     /** [name, fallback] */
     var: [string, PropertyType<T> | VariableOfType<PropertyType<T>> | undefined]
     /** Returns an object to spread into styles to set the value of the variable. */

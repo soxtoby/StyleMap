@@ -95,20 +95,21 @@ export function variable<T extends keyof CSSProperties & string>(property: T, di
     return variable
 }
 
-function createVariable<T extends keyof CSSProperties>(varName: string, property: string, fallback?: PropertyType<T> | Variable<T>): Variable<T> {
+function createVariable<T extends keyof CSSProperties>(cssName: string, property: string, fallback?: PropertyType<T> | Variable<T>): Variable<T> {
     return Object.assign(Object.create({
-        set(value: PropertyType<T>) {
+        get cssName() { return cssName },
+        set(value: PropertyType<T> | Variable<T>) {
             if (value === this)
-                throw new Error(`Variable ${varName} cannot be set to itself.`)
-            return { [varName]: cssPropertyValue(property, value) }
+                throw new Error(`Variable ${cssName} cannot be set to itself.`)
+            return { [cssName]: cssPropertyValue(property, value) }
         },
         or(newFallback: PropertyType<T> | Variable<T>) {
-            return createVariable<T>(varName, property, isVariable(fallback) ? fallback.or(newFallback) : newFallback)
+            return createVariable<T>(cssName, property, isVariable(fallback) ? fallback.or(newFallback) : newFallback)
         },
         toString() {
-            return `var(${[varName, cssPropertyValue(property, fallback)].filter(Boolean).join(', ')})`
+            return `var(${[cssName, cssPropertyValue(property, fallback)].filter(Boolean).join(', ')})`
         }
-    }), { var: [varName, fallback].filter(Boolean) })
+    }), { var: [cssName, fallback].filter(Boolean) })
 }
 
 function isVariable<T extends keyof CSSProperties>(value: any): value is Variable<T> {
