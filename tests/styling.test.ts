@@ -166,6 +166,7 @@ test("variables", () => {
     expect(test2.toString()).toBe('var(--test-1)')
     expect(defaultName.toString()).toBe('var(--width-2)')
     expect(test1.set('value')).toEqual({ '--test-0': 'value' })
+    expect(test1.set(undefined)).toEqual({})
     expect(test1.or('fallback') as object).toEqual({ var: ['--test-0', 'fallback'] })
     expect(test1.or('fallback').toString()).toBe('var(--test-0, fallback)')
     expect(test1.or(1).toString()).toBe('var(--test-0, 1px)')

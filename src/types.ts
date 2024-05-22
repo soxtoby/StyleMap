@@ -234,7 +234,7 @@ export interface Variable<T extends keyof CSSProperties> extends VariableOfType<
     /** [name, fallback] */
     var: [string, PropertyType<T> | VariableOfType<PropertyType<T>> | undefined]
     /** Returns an object to spread into styles to set the value of the variable. */
-    set(value: PropertyType<T> | VariableOfType<PropertyType<T>>): object
+    set(value: PropertyType<T> | VariableOfType<PropertyType<T>> | undefined): object
     /** Creates a variable with a fallback. */
     or(fallback: PropertyType<T> | VariableOfType<PropertyType<T>>): Variable<T>
     /** 
