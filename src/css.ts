@@ -226,7 +226,7 @@ export const propertySeparators: { [property in keyof MultiValueProperties]?: st
     animationRangeEnd: [' '],
     animationRangeStart: [' '],
     borderColor: [' '],
-    borderRadius: [' '],
+    borderRadius: [' ', ' / '],
     borderStyle: [' '],
     borderWidth: [' '],
     gridColumn: [' / '],
