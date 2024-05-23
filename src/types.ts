@@ -222,7 +222,7 @@ export interface KeyFrames extends Partial<Registerable> {
 
 export type PropertyType<T extends keyof CSSProperties> = Defined<ExtendedProperties[T]>
 
-interface VariableOfType<T> {
+export interface VariableOfType<T> {
     /** Enables mixing variables of different properties with same type, but won't actually exist on the object. */
     __type: T
 }

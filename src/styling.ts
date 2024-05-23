@@ -1,6 +1,6 @@
 import type { Property } from "csstype"
 import { css, cssProperties, cssPropertyValue, fontFaceCss, keyframesCss, splitProperties } from "./css.js"
-import type { AnimationDefinition, CSSProperties, ElementStyle, FontFaceDefinition, KeyFrames, PropertyType, Registerable, RegisteredStyles, Rules, StyleCollection, Styles, Variable } from "./types.js"
+import type { AnimationDefinition, CSSProperties, ElementStyle, FontFaceDefinition, KeyFrames, PropertyType, Registerable, RegisteredStyles, Rules, StyleCollection, Styles, Variable, VariableOfType } from "./types.js"
 
 export const RegistrationId = Symbol('RegistrationId')
 export type Registration = { [RegistrationId]?: string; }
@@ -78,7 +78,7 @@ export function animation(...args: any[]) {
  * @param displayName Display name for the custom CSS property.
  * @param defaultValue If specified, will be set in the `:root` selector.
  */
-export function variable<T extends keyof CSSProperties & string>(property: T, displayName?: string, defaultValue?: PropertyType<T>): Variable<T> {
+export function variable<T extends keyof CSSProperties & string>(property: T, displayName?: string, defaultValue?: PropertyType<T> | VariableOfType<PropertyType<T>>): Variable<T> {
     autoUpdateStylesheet()
 
     let namePrefix = displayName || property
