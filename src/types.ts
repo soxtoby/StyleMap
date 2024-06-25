@@ -1,4 +1,4 @@
-import type { AtRule, Properties, Property } from "csstype"
+import type { AtRule, Globals, Properties, Property } from "csstype"
 import type { Registration, StyleRendered } from "./styling.js"
 
 type Overwrite<T, U> = Omit<T, keyof T & keyof U> & U
@@ -81,6 +81,7 @@ export type CSSProperties = MultiValueProperties
 
 export interface Styles extends CSSProperties {
     $?: Rules
+    [customProperty: `--${string}`]: Globals | (string & {}) | VariableOfType<string>
     ':active'?: Styles
     ':checked'?: Styles
     ':default'?: Styles
@@ -234,7 +235,7 @@ export interface Variable<T extends keyof CSSProperties> extends VariableOfType<
     /** [name, fallback] */
     var: [string, PropertyType<T> | VariableOfType<PropertyType<T>> | undefined]
     /** Returns an object to spread into styles to set the value of the variable. */
-    set(value: PropertyType<T> | VariableOfType<PropertyType<T>> | undefined): object
+    set(value: PropertyType<T> | VariableOfType<PropertyType<T>> | undefined): Styles
     /** Creates a variable with a fallback. */
     or(fallback: PropertyType<T> | VariableOfType<PropertyType<T>>): Variable<T>
     /** 
