@@ -7,6 +7,7 @@ export type Registration = { [RegistrationId]?: string; }
 type NamedRegistration<T> = readonly [string, T] & Registration
 
 let registeredFontFaces = [] as FontFaceDefinition[]
+let rootStyles = {} as Styles
 let registeredRules = [] as Rules[]
 let registeredStyles = [] as NamedRegistration<RegisteredStyles>[]
 let registeredKeyframes = [] as NamedRegistration<KeyFrames>[]
@@ -90,7 +91,7 @@ export function variable<T extends keyof CSSProperties & string>(property: T, di
     registeredVariables[index] = variable
 
     if (defaultValue)
-        cssRules({ ':root': { ...variable.set(defaultValue) } });
+        Object.assign(rootStyles, variable.set(defaultValue))
 
     return variable
 }
@@ -180,6 +181,7 @@ export function enableHmrSupport(enable = true) {
 
 export function getCss() {
     return registeredFontFaces.map(fontFaceCss)
+        .concat(css({ ':root': rootStyles }))
         .concat(registeredRules.map(css))
         .concat(registeredStyles.map(([name, styles]) => css({ [`.${name}`]: styles })))
         .concat(registeredKeyframes.map(([name, frames]) => keyframesCss(name, frames)))
