@@ -13,7 +13,7 @@ let registeredStyles = [] as NamedRegistration<RegisteredStyles>[]
 let registeredKeyframes = [] as NamedRegistration<KeyFrames>[]
 let registeredVariables = [] as Variable<any>[]
 let stylesheetRequired = true
-let hmrEnabled = !!(globalThis.module as any)?.hot
+let hmrEnabled = !!(() => { try { return module } catch (e) { } })()?.hot
 let updateTimeout = 0
 export let stylesheet: HTMLStyleElement
 export const StyleRendered = Symbol('StyleRendered')
