@@ -159,7 +159,7 @@ function autoUpdateStylesheet() {
 
 export function updateStylesheet() {
     ensureStylesheet()
-    stylesheet.innerHTML = getCss() + '\n/*# sourceURL=stylemap.css */'
+    stylesheet.textContent = getCss() + '\n/*# sourceURL=stylemap.css */'
     registeredStyles.forEach(([, s]) => s[StyleRendered] = true)
 }
 
